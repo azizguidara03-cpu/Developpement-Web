@@ -1,0 +1,14 @@
+/* Global dark background for the whole page */
+body {
+  background-color: #1e293b; /* dark navy */
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+main {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 20px;
+}

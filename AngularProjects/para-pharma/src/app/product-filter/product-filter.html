@@ -1,0 +1,39 @@
+<section class="product-filter">
+  <h1 class="title">Catalogue — Para-pharmacie</h1>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Rechercher par nom..."
+      [(ngModel)]="search"
+    />
+  </div>
+
+  @if (filteredProducts.length > 0) {
+    <ul class="product-list">
+      @for (p of filteredProducts; track p.id) {
+        <li class="product-item">
+          <div class="info">
+            <strong>{{ p.name }}</strong>
+            <small>({{ p.category }})</small>
+          </div>
+          <div class="meta">
+            <span class="price">{{ p.price | number:'1.2-2' }} TND</span>
+            <span
+              class="stock"
+              [class.out]="p.stock === 0"
+              [class.low]="p.stock > 0 && p.stock < 5"
+              [class.ok]="p.stock >= 5"
+            >
+              {{ p.stock === 0 ? 'Rupture' : p.stock + ' en stock' }}
+            </span>
+          </div>
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="empty">
+      Aucun produit trouvé pour « {{ search }} »
+    </div>
+  }
+</section>
