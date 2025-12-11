@@ -110,17 +110,17 @@ import { takeUntil } from 'rxjs/operators';
           </div>
 
           <!-- Description -->
-          <div class="mt-8 pt-8 border-t border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Description</h3>
-            <p class="text-gray-700 whitespace-pre-wrap">{{ experience.description }}</p>
+          <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Description</h3>
+            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ experience.description }}</p>
           </div>
 
           <!-- Skills Gained -->
-          <div class="mt-8 pt-8 border-t border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Skills Gained</h3>
+          <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Skills Gained</h3>
             <div class="flex flex-wrap gap-3">
               @for (skill of experience.skillsGained; track skill) {
-                <span class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full font-medium">
+                <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-medium transition-colors">
                   {{ skill }}
                 </span>
               }
@@ -128,41 +128,41 @@ import { takeUntil } from 'rxjs/operators';
           </div>
 
           <!-- Metadata -->
-          <div class="mt-8 pt-8 border-t border-gray-200 flex gap-6 text-sm text-gray-600">
+          <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 flex gap-6 text-sm text-gray-600 dark:text-gray-400">
             <span>Created: {{ experience.createdAt | date: 'MMM dd, yyyy HH:mm' }}</span>
             <span>Last Updated: {{ experience.updatedAt | date: 'MMM dd, yyyy HH:mm' }}</span>
           </div>
         </div>
 
         <!-- Related Member Info -->
-        <div *ngIf="member" class="bg-white rounded-lg shadow-md p-8">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6">Member Information</h3>
+        <div *ngIf="member" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 transition-colors duration-300">
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Member Information</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium text-gray-600 mb-2">Full Name</label>
-              <p class="text-lg font-semibold text-gray-900">{{ member.fullName }}</p>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Full Name</label>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ member.fullName }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-600 mb-2">Email</label>
-              <p class="text-lg font-semibold text-gray-900">{{ member.email }}</p>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Email</label>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ member.email }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-600 mb-2">Department</label>
-              <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 font-semibold rounded-full text-sm">
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Department</label>
+              <span class="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 font-semibold rounded-full text-sm">
                 {{ member.department }}
               </span>
             </div>
             <div *ngIf="member.age">
-              <label class="block text-sm font-medium text-gray-600 mb-2">Age</label>
-              <p class="text-lg font-semibold text-gray-900">{{ member.age }}</p>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Age</label>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ member.age }}</p>
             </div>
           </div>
 
           <div class="mt-6">
-            <label class="block text-sm font-medium text-gray-600 mb-2">Skills</label>
+            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Skills</label>
             <div class="flex flex-wrap gap-2">
               @for (skill of member.skills; track skill) {
-                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
+                <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full transition-colors">
                   {{ skill }}
                 </span>
               }
@@ -171,7 +171,7 @@ import { takeUntil } from 'rxjs/operators';
 
           <a
             [routerLink]="['/members', member.id]"
-            class="inline-block mt-6 px-6 py-2 bg-blue-50 text-blue-600 font-semibold rounded-lg hover:bg-blue-100 transition"
+            class="inline-block mt-6 px-6 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition"
           >
             View Full Member Profile
           </a>
@@ -180,9 +180,9 @@ import { takeUntil } from 'rxjs/operators';
 
       <!-- Not Found -->
       <div *ngIf="!experience && !isLoading" class="max-w-4xl mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow-md p-8 text-center">
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">Experience not found</h2>
-          <p class="text-gray-600 mb-4">The experience you're looking for doesn't exist.</p>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center transition-colors duration-300">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Experience not found</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">The experience you're looking for doesn't exist.</p>
           <a
             routerLink="/experiences"
             class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"

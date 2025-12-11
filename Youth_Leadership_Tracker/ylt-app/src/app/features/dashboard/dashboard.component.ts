@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DashboardService, DashboardStats, ChartData, TimelineItem } from '../../services/dashboard.service';
+import { GamificationService, Badge } from '../../services/gamification.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -22,6 +23,7 @@ import { takeUntil } from 'rxjs/operators';
       <!-- Main Content -->
       <div *ngIf="stats" class="max-w-7xl mx-auto px-4 py-8">
         
+
         <!-- Leadership Score Section -->
         <div class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl shadow-xl p-6 mb-8 text-white">
           <div class="flex flex-col md:flex-row md:items-center gap-6">
@@ -66,6 +68,41 @@ import { takeUntil } from 'rxjs/operators';
             </div>
           </div>
         </div>
+                <!-- Achievements / Badges Section -->
+        <div *ngIf="earnedBadges.length > 0" class="mb-8">
+          <div class="flex items-center gap-2 mb-4">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Achievements</h2>
+            <span class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200 text-xs font-bold rounded-full uppercase tracking-wider">
+              {{ earnedBadges.length }} Earned
+            </span>
+          </div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            @for (badge of earnedBadges; track badge.id) {
+              <div class="relative group">
+                <div [class]="'flex flex-col items-center justify-center p-4 rounded-xl border-2 border-transparent transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-help ' + badge.colorClass">
+                  <span class="text-3xl mb-2">{{ badge.icon }}</span>
+                  <span class="text-xs font-bold text-center leading-tight">{{ badge.label }}</span>
+                </div>
+                
+                <!-- Tooltip -->
+                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                  <div class="bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg py-2 px-3 text-center shadow-xl">
+                    <p class="font-bold mb-1">{{ badge.label }}</p>
+                    <p>{{ badge.description }}</p>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                  </div>
+                </div>
+              </div>
+            }
+            
+            <!-- Empty slots for unearned (optional, or just show earned) -->
+             <div *ngIf="earnedBadges.length === 0" class="col-span-full p-8 text-center bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 text-gray-400">
+               No badges earned yet. Start completing experiences!
+             </div>
+          </div>
+        </div>
+
 
         <!-- Key Metrics Row -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -388,6 +425,9 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private dashboardService = inject(DashboardService);
+  private gamificationService = inject(GamificationService);
+
+  earnedBadges: Badge[] = [];
 
   stats: DashboardStats | null = null;
   memberDeptSegments: PieSegment[] = [];
@@ -407,9 +447,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((stats) => {
         this.stats = stats;
-        this.memberDeptSegments = this.calculatePieSegments(stats.membersByDepartmentChart, stats.totalMembers);
-        this.roleSegments = this.calculatePieSegments(stats.experiencesByRoleChart, stats.totalExperiences);
+        if (stats) {
+          this.memberDeptSegments = this.calculatePieSegments(stats.membersByDepartmentChart, stats.totalMembers);
+          this.roleSegments = this.calculatePieSegments(stats.experiencesByRoleChart, stats.totalExperiences);
+          // Calculate badges
+          this.calculateBadges();
+        }
       });
+  }
+
+  private calculateBadges(): void {
+    const user = JSON.parse(localStorage.getItem('ylt_user') || '{}');
+    if (!user.id) return;
+
+    // We need the member ID associated with this user
+    // The members mock data is in 'ylt_members'
+    const allMembers = JSON.parse(localStorage.getItem('ylt_members') || '[]');
+    // Find member by matching email or just assuming ID mapping if 1:1. 
+    // Current setup: User ID 1 == Member ID 1.
+    const member = allMembers.find((m: any) => m.id === user.id);
+    
+    if (member) {
+      const allExperiences = JSON.parse(localStorage.getItem('ylt_experiences') || '[]');
+      const memberExperiences = allExperiences.filter((e: any) => e.memberId === member.id);
+      this.earnedBadges = this.gamificationService.getBadgesForMember(member, memberExperiences);
+    }
   }
 
   // Listen for localStorage changes from other tabs or DevTools edits
