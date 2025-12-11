@@ -308,17 +308,24 @@ export class ExperiencesListComponent implements OnInit, OnDestroy {
   private applyFiltersAndSort(): void {
     let filtered = [...this.allExperiences];
 
-    // Apply search
+    // Apply search (including member name)
     if (this.searchQuery.trim()) {
-      this.experiencesService.searchExperiences(this.searchQuery)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((result) => {
-          filtered = result;
-          this.applyRoleFilter(filtered);
-        });
-    } else {
-      this.applyRoleFilter(filtered);
+      const lowerQuery = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(exp => {
+        // Search in role, department, description
+        const matchesRole = exp.role.toLowerCase().includes(lowerQuery);
+        const matchesDept = exp.department.toLowerCase().includes(lowerQuery);
+        const matchesDesc = exp.description.toLowerCase().includes(lowerQuery);
+        
+        // Search in member name
+        const memberName = this.memberMap.get(exp.memberId) || '';
+        const matchesMember = memberName.toLowerCase().includes(lowerQuery);
+        
+        return matchesRole || matchesDept || matchesDesc || matchesMember;
+      });
     }
+    
+    this.applyRoleFilter(filtered);
   }
 
   private applyRoleFilter(experiences: Experience[]): void {
