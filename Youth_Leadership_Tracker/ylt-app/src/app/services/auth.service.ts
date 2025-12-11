@@ -1,11 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { User, AuthResponse } from '../models/auth';
+import { User, AuthResponse, UserRole, DEPARTMENTS } from '../models/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  // Signal-based current user for reactive access
+  private _currentUser = signal<User | null>(this.getUserFromStorage());
+  public currentUser = this._currentUser.asReadonly();
+  
+  // Computed signal for checking authentication
+  public isLoggedIn = computed(() => this._currentUser() !== null);
+
+  // BehaviorSubjects for observable-based access (backwards compatibility)
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -17,28 +25,89 @@ export class AuthService {
   private readonly MAX_ATTEMPTS = 3;
   private readonly LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutes
 
-  // Mock users database
+  // Mock users database with roles
   private mockUsers = [
     {
       id: 1,
-      fullName: 'Ahmed Ben Ali',
-      email: 'ahmed@aiesec.org',
+      fullName: 'Admin User',
+      email: 'admin@aiesec.org',
       password: 'password123',
-      department: 'VP',
-      role: 'Vice President'
+      department: 'Information Management',
+      userRole: 'admin' as UserRole
     },
     {
       id: 2,
-      fullName: 'Fatima Zahra',
+      fullName: 'Ahmed VP',
+      email: 'ahmed@aiesec.org',
+      password: 'password123',
+      department: 'OGV',
+      userRole: 'vp' as UserRole
+    },
+    {
+      id: 3,
+      fullName: 'Fatima TL',
       email: 'fatima@aiesec.org',
       password: 'password123',
-      department: 'OC',
-      role: 'Organizational Committee'
+      department: 'IGT',
+      userRole: 'tl' as UserRole
+    },
+    {
+      id: 4,
+      fullName: 'Ali Member',
+      email: 'ali@aiesec.org',
+      password: 'password123',
+      department: 'Marketing',
+      userRole: 'member' as UserRole
     }
   ];
 
   constructor() {
     this.checkLockoutStatus();
+  }
+
+  /**
+   * Check if current user has a specific role
+   */
+  hasRole(role: UserRole): boolean {
+    const user = this._currentUser();
+    return user?.userRole === role;
+  }
+
+  /**
+   * Check if current user has any of the specified roles
+   */
+  hasAnyRole(roles: UserRole[]): boolean {
+    const user = this._currentUser();
+    if (!user) return false;
+    return roles.includes(user.userRole);
+  }
+
+  /**
+   * Get current user's role
+   */
+  getUserRole(): UserRole | null {
+    return this._currentUser()?.userRole ?? null;
+  }
+
+  /**
+   * Check if user can access admin features
+   */
+  isAdmin(): boolean {
+    return this.hasRole('admin');
+  }
+
+  /**
+   * Check if user can edit experiences (admin, vp, tl)
+   */
+  canEditExperiences(): boolean {
+    return this.hasAnyRole(['admin', 'vp', 'tl']);
+  }
+
+  /**
+   * Check if user can manage members (admin only)
+   */
+  canManageMembers(): boolean {
+    return this.hasRole('admin');
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
@@ -76,23 +145,19 @@ export class AuthService {
           localStorage.removeItem('ylt_lockout_time');
           
           const token = this.generateToken();
-          localStorage.setItem('ylt_token', token);
-          localStorage.setItem('ylt_user', JSON.stringify({
-            id: user.id,
-            fullName: user.fullName,
-            email: user.email,
-            department: user.department,
-            role: user.role || 'Team Member'
-          }));
-
           const currentUser: User = {
             id: user.id,
             fullName: user.fullName,
             email: user.email,
             department: user.department,
-            role: user.role || 'Team Member'
+            userRole: (user.userRole as UserRole) || 'member'
           };
 
+          localStorage.setItem('ylt_token', token);
+          localStorage.setItem('ylt_user', JSON.stringify(currentUser));
+
+          // Update both signal and BehaviorSubject
+          this._currentUser.set(currentUser);
           this.currentUserSubject.next(currentUser);
           this.isAuthenticatedSubject.next(true);
 
@@ -132,12 +197,12 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('ylt_token');
     localStorage.removeItem('ylt_user');
+    this._currentUser.set(null);
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }
 
   isAuthenticated(): boolean {
-    // Return the current value from BehaviorSubject instead of checking localStorage
     return this.isAuthenticatedSubject.value;
   }
 
@@ -146,12 +211,12 @@ export class AuthService {
   }
 
   getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
+    return this._currentUser();
   }
 
   private generateToken(): string {
     return btoa(JSON.stringify({
-      user: this.currentUserSubject.value?.id,
+      user: this._currentUser()?.id,
       timestamp: Date.now(),
       random: Math.random()
     }));
@@ -178,7 +243,12 @@ export class AuthService {
 
   private getRegisteredUsers(): any[] {
     const usersStr = localStorage.getItem('ylt_users');
-    return usersStr ? JSON.parse(usersStr) : [];
+    const users = usersStr ? JSON.parse(usersStr) : [];
+    // Ensure all registered users have a default role
+    return users.map((u: any) => ({
+      ...u,
+      userRole: u.userRole || 'member'
+    }));
   }
 
   getLockoutTime$(): Observable<number> {

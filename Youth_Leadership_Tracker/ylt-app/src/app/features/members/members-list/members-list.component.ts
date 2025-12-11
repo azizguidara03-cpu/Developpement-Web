@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MembersService } from '../../../services/members.service';
+import { AuthService } from '../../../services/auth.service';
 import { Member } from '../../../models/member';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -22,6 +23,7 @@ import { takeUntil } from 'rxjs/operators';
               <p class="text-gray-600 dark:text-gray-400 mt-2">Manage your AIESEC local committee members</p>
             </div>
             <a 
+              *ngIf="canManageMembers"
               routerLink="/members/create"
               class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg transition"
             >
@@ -57,14 +59,15 @@ import { takeUntil } from 'rxjs/operators';
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
                 <option value="">All Departments</option>
-                <option value="TM">Team Member</option>
-                <option value="TL">Team Leader</option>
-                <option value="OGX">Organizational</option>
-                <option value="ICX">International Cooperation</option>
-                <option value="ER">Experience Research</option>
-                <option value="VP">Vice President</option>
-                <option value="OC">Organizational Committee</option>
-                <option value="EST">External</option>
+                <option value="IGV">IGV</option>
+                <option value="IGT">IGT</option>
+                <option value="OGV">OGV</option>
+                <option value="OGT">OGT</option>
+                <option value="Talent Management">Talent Management</option>
+                <option value="Finance">Finance</option>
+                <option value="Business Development">Business Development</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Information Management">Information Management</option>
               </select>
             </div>
 
@@ -138,12 +141,14 @@ import { takeUntil } from 'rxjs/operators';
                   View
                 </a>
                 <a
+                  *ngIf="canManageMembers"
                   [routerLink]="['/members', member.id, 'edit']"
                   class="flex-1 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition text-center"
                 >
                   Edit
                 </a>
                 <button
+                  *ngIf="canManageMembers"
                   (click)="deleteMember(member.id)"
                   class="flex-1 px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-semibold rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition"
                 >
@@ -212,6 +217,10 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class MembersListComponent implements OnInit, OnDestroy {
   private membersService = inject(MembersService);
+  private authService = inject(AuthService);
+
+  // Role-based access control
+  canManageMembers = this.authService.canManageMembers();
 
   allMembers: Member[] = [];
   filteredMembers: Member[] = [];

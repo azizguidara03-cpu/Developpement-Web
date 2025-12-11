@@ -46,8 +46,8 @@ import { takeUntil } from 'rxjs/operators';
                 <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 font-semibold text-sm rounded-full">
                   {{ currentUser.department }}
                 </span>
-                <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-300 font-semibold text-sm rounded-full">
-                  {{ currentUser.role }}
+                <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-300 font-semibold text-sm rounded-full uppercase">
+                  {{ currentUser.userRole }}
                 </span>
               </div>
             </div>
@@ -90,15 +90,16 @@ import { takeUntil } from 'rxjs/operators';
                 />
               </div>
 
-              <!-- Role -->
+              <!-- Role (Read-only) -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
                 <input
                   type="text"
-                  [(ngModel)]="editedUser.role"
-                  [disabled]="!isEditMode"
-                  class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
+                  [value]="editedUser.userRole?.toUpperCase()"
+                  disabled
+                  class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg cursor-not-allowed"
                 />
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Role cannot be changed from profile</p>
               </div>
             </div>
           </div>

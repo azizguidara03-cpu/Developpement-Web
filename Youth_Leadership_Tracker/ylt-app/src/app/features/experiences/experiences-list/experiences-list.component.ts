@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ExperiencesService } from '../../../services/experiences.service';
 import { MembersService } from '../../../services/members.service';
+import { AuthService } from '../../../services/auth.service';
 import { Experience } from '../../../models/experience';
 import { Member } from '../../../models/member';
 import { Subject } from 'rxjs';
@@ -24,6 +25,7 @@ import { takeUntil } from 'rxjs/operators';
               <p class="text-gray-600 dark:text-gray-400 mt-2">Manage member leadership experiences and roles</p>
             </div>
             <a 
+              *ngIf="canEditExperiences"
               routerLink="/experiences/create"
               class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg transition"
             >
@@ -61,9 +63,13 @@ import { takeUntil } from 'rxjs/operators';
                 <option value="">All Roles</option>
                 <option value="Team Member">Team Member</option>
                 <option value="Team Leader">Team Leader</option>
-                <option value="Organizational Committee">Organizational Committee</option>
                 <option value="Vice President">Vice President</option>
-                <option value="Experience Research">Experience Research</option>
+                <option value="Local Committee President">Local Committee President</option>
+                <option value="OC Member">OC Member</option>
+                <option value="OC Vice President">OC Vice President</option>
+                <option value="OC President">OC President</option>
+                <option value="Local Support Team">Local Support Team</option>
+                <option value="Entity Support Team">Entity Support Team</option>
               </select>
             </div>
 
@@ -76,14 +82,15 @@ import { takeUntil } from 'rxjs/operators';
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
                 <option value="">All Departments</option>
-                <option value="TM">Team Member</option>
-                <option value="TL">Team Leader</option>
-                <option value="OGX">Organizational</option>
-                <option value="ICX">International Cooperation</option>
-                <option value="ER">Experience Research</option>
-                <option value="VP">Vice President</option>
-                <option value="OC">Organizational Committee</option>
-                <option value="EST">External</option>
+                <option value="IGV">IGV</option>
+                <option value="IGT">IGT</option>
+                <option value="OGV">OGV</option>
+                <option value="OGT">OGT</option>
+                <option value="Talent Management">Talent Management</option>
+                <option value="Finance">Finance</option>
+                <option value="Business Development">Business Development</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Information Management">Information Management</option>
               </select>
             </div>
 
@@ -167,12 +174,14 @@ import { takeUntil } from 'rxjs/operators';
                   View Details
                 </a>
                 <a
+                  *ngIf="canEditExperiences"
                   [routerLink]="['/experiences', experience.id, 'edit']"
                   class="flex-1 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition text-center"
                 >
                   Edit
                 </a>
                 <button
+                  *ngIf="canEditExperiences"
                   (click)="deleteExperience(experience.id)"
                   class="flex-1 px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-semibold rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition"
                 >
@@ -242,6 +251,10 @@ import { takeUntil } from 'rxjs/operators';
 export class ExperiencesListComponent implements OnInit, OnDestroy {
   private experiencesService = inject(ExperiencesService);
   private membersService = inject(MembersService);
+  private authService = inject(AuthService);
+
+  // Role-based access control
+  canEditExperiences = this.authService.canEditExperiences();
 
   allExperiences: Experience[] = [];
   filteredExperiences: Experience[] = [];

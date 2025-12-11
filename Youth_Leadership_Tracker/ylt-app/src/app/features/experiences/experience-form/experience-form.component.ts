@@ -78,9 +78,13 @@ import { Skills } from '../../../models/enums';
                 <option value="">Select Role</option>
                 <option value="Team Member">Team Member</option>
                 <option value="Team Leader">Team Leader</option>
-                <option value="Organizational Committee">Organizational Committee</option>
                 <option value="Vice President">Vice President</option>
-                <option value="Experience Research">Experience Research</option>
+                <option value="Local Committee President">Local Committee President</option>
+                <option value="OC Member">OC Member</option>
+                <option value="OC Vice President">OC Vice President</option>
+                <option value="OC President">OC President</option>
+                <option value="Local Support Team">Local Support Team</option>
+                <option value="Entity Support Team">Entity Support Team</option>
               </select>
               <p *ngIf="isFieldInvalid('role')" class="text-red-500 text-sm mt-1">
                 Role is required
@@ -97,14 +101,15 @@ import { Skills } from '../../../models/enums';
                 class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
                 <option value="">Select Department</option>
-                <option value="TM">Team Member</option>
-                <option value="TL">Team Leader</option>
-                <option value="OGX">Organizational</option>
-                <option value="ICX">International Cooperation</option>
-                <option value="ER">Experience Research</option>
-                <option value="VP">Vice President</option>
-                <option value="OC">Organizational Committee</option>
-                <option value="EST">External</option>
+                <option value="IGV">IGV (Incoming Global Volunteer)</option>
+                <option value="IGT">IGT (Incoming Global Talent)</option>
+                <option value="OGV">OGV (Outgoing Global Volunteer)</option>
+                <option value="OGT">OGT (Outgoing Global Talent)</option>
+                <option value="Talent Management">Talent Management</option>
+                <option value="Finance">Finance</option>
+                <option value="Business Development">Business Development</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Information Management">Information Management</option>
               </select>
               <p *ngIf="isFieldInvalid('department')" class="text-red-500 text-sm mt-1">
                 Department is required

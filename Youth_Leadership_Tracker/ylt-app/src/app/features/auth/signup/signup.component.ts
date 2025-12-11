@@ -118,14 +118,15 @@ import { MembersService } from '../../../services/members.service';
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
                 <option value="">Select a department</option>
-                <option value="VP">VP (Vice President)</option>
-                <option value="OC">OC (Organizational Committee)</option>
-                <option value="ER">ER (External Relations)</option>
-                <option value="TM">TM (Team Member)</option>
-                <option value="TL">TL (Team Leader)</option>
-                <option value="OGX">OGX (Outgoing Exchange)</option>
-                <option value="ICX">ICX (Incoming Exchange)</option>
-                <option value="EST">EST (Establishment)</option>
+                <option value="IGV">IGV (Incoming Global Volunteer)</option>
+                <option value="IGT">IGT (Incoming Global Talent)</option>
+                <option value="OGV">OGV (Outgoing Global Volunteer)</option>
+                <option value="OGT">OGT (Outgoing Global Talent)</option>
+                <option value="Talent Management">Talent Management</option>
+                <option value="Finance">Finance</option>
+                <option value="Business Development">Business Development</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Information Management">Information Management</option>
               </select>
               <p *ngIf="department.invalid && (department.dirty || department.touched)" class="text-red-500 dark:text-red-400 text-sm mt-1">
                 Department is required

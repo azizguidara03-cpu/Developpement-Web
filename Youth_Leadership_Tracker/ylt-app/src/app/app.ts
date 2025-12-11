@@ -55,6 +55,14 @@ import { takeUntil, filter } from 'rxjs/operators';
                 Profile
               </a>
               
+              <!-- User Role Badge -->
+              <div *ngIf="currentUser$ | async as user" class="flex items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">
+                <span class="text-sm text-gray-600 dark:text-gray-300">{{ user.fullName }}</span>
+                <span [ngClass]="getRoleBadgeClass(user.userRole)" class="px-2 py-0.5 text-xs font-bold rounded-full uppercase">
+                  {{ user.userRole }}
+                </span>
+              </div>
+              
               <!-- Theme Toggle Button -->
               <button
                 (click)="toggleTheme()"
@@ -137,6 +145,7 @@ export class App implements OnInit, OnDestroy {
   themeService = inject(ThemeService);
 
   isAuthenticated$ = this.authService.isAuthenticated$;
+  currentUser$ = this.authService.currentUser$;
   private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
@@ -165,6 +174,16 @@ export class App implements OnInit, OnDestroy {
       this.authService.logout();
       this.router.navigate(['/login']);
     }
+  }
+
+  getRoleBadgeClass(role: string): string {
+    const classes: { [key: string]: string } = {
+      'admin': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+      'vp': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+      'tl': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+      'member': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+    };
+    return classes[role] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   }
 
   ngOnDestroy(): void {

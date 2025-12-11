@@ -6,7 +6,7 @@ import { MembersService } from '../../../services/members.service';
 import { Member, MemberFormData } from '../../../models/member';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Skills, DEPARTMENTS } from '../../../models/enums';
+import { Skills, DEPARTMENTS, DEPARTMENT_LABELS } from '../../../models/enums';
 
 @Component({
   selector: 'app-member-form',
@@ -297,17 +297,7 @@ export class MemberFormComponent implements OnInit, OnDestroy {
   }
 
   getDepartmentLabel(dept: string): string {
-    const labels: { [key: string]: string } = {
-      'TM': 'Team Member',
-      'TL': 'Team Leader',
-      'OGX': 'Organizational',
-      'ICX': 'International Cooperation',
-      'ER': 'Experience Research',
-      'VP': 'Vice President',
-      'OC': 'Organizational Committee',
-      'EST': 'External'
-    };
-    return labels[dept] || dept;
+    return DEPARTMENT_LABELS[dept] || dept;
   }
 
   ngOnDestroy(): void {
