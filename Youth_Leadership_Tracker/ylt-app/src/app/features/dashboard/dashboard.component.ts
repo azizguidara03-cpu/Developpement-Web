@@ -10,7 +10,7 @@ import { takeUntil } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
       <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 py-8">
@@ -24,14 +24,14 @@ import { takeUntil } from 'rxjs/operators';
         <!-- Key Metrics -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <!-- Total Members -->
-          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-t-4 border-blue-500">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition border-t-4 border-blue-500">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-gray-600 text-sm font-medium">Total Members</p>
-                <h3 class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalMembers }}</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Members</p>
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ stats.totalMembers }}</h3>
               </div>
-              <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                 </svg>
               </div>
@@ -39,14 +39,14 @@ import { takeUntil } from 'rxjs/operators';
           </div>
 
           <!-- Total Experiences -->
-          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-t-4 border-indigo-500">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition border-t-4 border-indigo-500">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-gray-600 text-sm font-medium">Total Experiences</p>
-                <h3 class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalExperiences }}</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Experiences</p>
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ stats.totalExperiences }}</h3>
               </div>
-              <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
+                <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
@@ -54,14 +54,14 @@ import { takeUntil } from 'rxjs/operators';
           </div>
 
           <!-- Active Experiences -->
-          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-t-4 border-green-500">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition border-t-4 border-green-500">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-gray-600 text-sm font-medium">Active Experiences</p>
-                <h3 class="text-3xl font-bold text-gray-900 mt-2">{{ stats.activeExperiences }}</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Active Experiences</p>
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ stats.activeExperiences }}</h3>
               </div>
-              <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               </div>
@@ -69,14 +69,14 @@ import { takeUntil } from 'rxjs/operators';
           </div>
 
           <!-- Completed Experiences -->
-          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-t-4 border-amber-500">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition border-t-4 border-amber-500">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-gray-600 text-sm font-medium">Completed Experiences</p>
-                <h3 class="text-3xl font-bold text-gray-900 mt-2">{{ stats.completedExperiences }}</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Completed Experiences</p>
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ stats.completedExperiences }}</h3>
               </div>
-              <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
-                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
@@ -87,16 +87,16 @@ import { takeUntil } from 'rxjs/operators';
         <!-- Charts and Analysis Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <!-- Top Skills -->
-          <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Top Skills Developed</h2>
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors duration-300">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Top Skills Developed</h2>
             <div class="space-y-4">
               @for (skill of stats.topSkills; track skill.skill) {
                 <div>
                   <div class="flex justify-between mb-2">
-                    <span class="text-gray-700 font-medium">{{ skill.skill }}</span>
-                    <span class="text-gray-600 text-sm">{{ skill.count }} times</span>
+                    <span class="text-gray-700 dark:text-gray-300 font-medium">{{ skill.skill }}</span>
+                    <span class="text-gray-600 dark:text-gray-400 text-sm">{{ skill.count }} times</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div
                       class="bg-blue-500 h-2 rounded-full transition-all"
                       [style.width.%]="getSkillPercentage(skill.count)"
@@ -105,26 +105,26 @@ import { takeUntil } from 'rxjs/operators';
                 </div>
               }
               <div *ngIf="stats.topSkills.length === 0" class="text-center py-8">
-                <p class="text-gray-600">No skills data available yet</p>
+                <p class="text-gray-600 dark:text-gray-400">No skills data available yet</p>
               </div>
             </div>
           </div>
 
           <!-- Members by Department -->
-          <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Members by Department</h2>
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors duration-300">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Members by Department</h2>
             <div class="space-y-4">
               @for (dept of getDepartmentEntries(); track dept[0]) {
                 <div class="flex items-center justify-between">
-                  <span class="text-gray-700 font-medium">{{ getDepartmentLabel(dept[0]) }}</span>
+                  <span class="text-gray-700 dark:text-gray-300 font-medium">{{ getDepartmentLabel(dept[0]) }}</span>
                   <div class="flex items-center gap-3">
-                    <div class="w-48 bg-gray-200 rounded-full h-2">
+                    <div class="w-48 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div
                         class="bg-indigo-500 h-2 rounded-full transition-all"
                         [style.width.%]="getPercentage(dept[1], stats.totalMembers)"
                       ></div>
                     </div>
-                    <span class="text-gray-600 text-sm font-semibold w-12">{{ dept[1] }}</span>
+                    <span class="text-gray-600 dark:text-gray-400 text-sm font-semibold w-12">{{ dept[1] }}</span>
                   </div>
                 </div>
               }
@@ -133,18 +133,18 @@ import { takeUntil } from 'rxjs/operators';
         </div>
 
         <!-- Experiences by Role -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Experiences by Leadership Role</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 transition-colors duration-300">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Experiences by Leadership Role</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @for (role of getRoleEntries(); track role[0]) {
-              <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border-l-4 border-blue-500">
+              <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750 rounded-lg p-4 border-l-4 border-blue-500">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-gray-600 text-sm font-medium">{{ role[0] }}</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ role[1] }}</p>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">{{ role[0] }}</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ role[1] }}</p>
                   </div>
                   <div class="text-right">
-                    <p class="text-gray-600 text-sm">
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">
                       {{ getPercentage(role[1], stats.totalExperiences) }}%
                     </p>
                   </div>
@@ -201,9 +201,9 @@ import { takeUntil } from 'rxjs/operators';
       <div *ngIf="!stats" class="flex items-center justify-center min-h-screen">
         <div class="text-center">
           <div class="inline-block">
-            <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <div class="w-12 h-12 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></div>
           </div>
-          <p class="text-gray-600 mt-4">Loading dashboard data...</p>
+          <p class="text-gray-600 dark:text-gray-400 mt-4">Loading dashboard data...</p>
         </div>
       </div>
     </div>

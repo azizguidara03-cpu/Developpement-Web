@@ -10,50 +10,50 @@ import { MembersService } from '../../../services/members.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 transition-colors duration-300">
       <div class="max-w-md mx-auto">
         <!-- Logo -->
         <div class="text-center mb-8">
           <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
             YLT
           </div>
-          <h1 class="text-3xl font-bold text-gray-900">Youth Leadership Tracker</h1>
-          <p class="text-gray-600 mt-2">Create your account</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Youth Leadership Tracker</h1>
+          <p class="text-gray-600 dark:text-gray-400 mt-2">Create your account</p>
         </div>
 
         <!-- Sign Up Form -->
-        <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 transition-colors duration-300">
           <!-- Error Message -->
-          <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-            <p class="text-red-700 font-medium text-sm">{{ errorMessage }}</p>
+          <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 rounded-lg">
+            <p class="text-red-700 dark:text-red-400 font-medium text-sm">{{ errorMessage }}</p>
           </div>
 
           <!-- Success Message -->
-          <div *ngIf="successMessage" class="mb-4 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
-            <p class="text-green-700 font-medium text-sm">{{ successMessage }}</p>
+          <div *ngIf="successMessage" class="mb-4 p-4 bg-green-50 dark:bg-green-900/30 border-l-4 border-green-500 rounded-lg">
+            <p class="text-green-700 dark:text-green-400 font-medium text-sm">{{ successMessage }}</p>
           </div>
 
           <form (ngSubmit)="signup()" #signupForm="ngForm">
             <!-- Full Name -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
               <input
                 type="text"
                 name="fullName"
                 [(ngModel)]="signupData.fullName"
                 #fullName="ngModel"
                 required
-                class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition"
+                class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
                 placeholder="Enter your full name"
               />
-              <p *ngIf="fullName.invalid && (fullName.dirty || fullName.touched)" class="text-red-500 text-sm mt-1">
+              <p *ngIf="fullName.invalid && (fullName.dirty || fullName.touched)" class="text-red-500 dark:text-red-400 text-sm mt-1">
                 Full name is required
               </p>
             </div>
 
             <!-- Email -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
               <input
                 type="email"
                 name="email"
@@ -61,17 +61,17 @@ import { MembersService } from '../../../services/members.service';
                 #email="ngModel"
                 required
                 email
-                class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition"
+                class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
                 placeholder="Enter your email"
               />
-              <p *ngIf="email.invalid && (email.dirty || email.touched)" class="text-red-500 text-sm mt-1">
+              <p *ngIf="email.invalid && (email.dirty || email.touched)" class="text-red-500 dark:text-red-400 text-sm mt-1">
                 {{ email.errors?.['required'] ? 'Email is required' : 'Please enter a valid email' }}
               </p>
             </div>
 
             <!-- Password -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
               <input
                 type="password"
                 name="password"
@@ -79,43 +79,43 @@ import { MembersService } from '../../../services/members.service';
                 #password="ngModel"
                 required
                 minlength="6"
-                class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition"
+                class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
                 placeholder="Enter your password (min 6 characters)"
               />
-              <p *ngIf="password.invalid && (password.dirty || password.touched)" class="text-red-500 text-sm mt-1">
+              <p *ngIf="password.invalid && (password.dirty || password.touched)" class="text-red-500 dark:text-red-400 text-sm mt-1">
                 {{ password.errors?.['required'] ? 'Password is required' : 'Password must be at least 6 characters' }}
               </p>
             </div>
 
             <!-- Confirm Password -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm Password</label>
               <input
                 type="password"
                 name="confirmPassword"
                 [(ngModel)]="signupData.confirmPassword"
                 #confirmPassword="ngModel"
                 required
-                class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition"
+                class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
                 placeholder="Confirm your password"
               />
-              <p *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)" class="text-red-500 text-sm mt-1">
+              <p *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)" class="text-red-500 dark:text-red-400 text-sm mt-1">
                 {{ confirmPassword.errors?.['required'] ? 'Confirmation is required' : '' }}
               </p>
-              <p *ngIf="signupData.password && signupData.confirmPassword && signupData.password !== signupData.confirmPassword" class="text-red-500 text-sm mt-1">
+              <p *ngIf="signupData.password && signupData.confirmPassword && signupData.password !== signupData.confirmPassword" class="text-red-500 dark:text-red-400 text-sm mt-1">
                 Passwords do not match
               </p>
             </div>
 
             <!-- Department -->
             <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Department</label>
               <select
                 name="department"
                 [(ngModel)]="signupData.department"
                 #department="ngModel"
                 required
-                class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition"
+                class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
                 <option value="">Select a department</option>
                 <option value="VP">VP (Vice President)</option>
@@ -127,7 +127,7 @@ import { MembersService } from '../../../services/members.service';
                 <option value="ICX">ICX (Incoming Exchange)</option>
                 <option value="EST">EST (Establishment)</option>
               </select>
-              <p *ngIf="department.invalid && (department.dirty || department.touched)" class="text-red-500 text-sm mt-1">
+              <p *ngIf="department.invalid && (department.dirty || department.touched)" class="text-red-500 dark:text-red-400 text-sm mt-1">
                 Department is required
               </p>
             </div>
@@ -144,9 +144,9 @@ import { MembersService } from '../../../services/members.service';
 
           <!-- Login Link -->
           <div class="mt-6 text-center">
-            <p class="text-gray-600">
+            <p class="text-gray-600 dark:text-gray-400">
               Already have an account?
-              <a routerLink="/login" class="text-blue-600 font-semibold hover:text-blue-700 transition">
+              <a routerLink="/login" class="text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700 dark:hover:text-blue-300 transition">
                 Sign in here
               </a>
             </p>
@@ -154,15 +154,15 @@ import { MembersService } from '../../../services/members.service';
         </div>
 
         <!-- Info Box -->
-        <div class="mt-6 bg-white rounded-lg shadow-md p-6">
-          <h3 class="font-semibold text-gray-900 mb-3">Demo Credentials</h3>
-          <p class="text-sm text-gray-600 mb-3">Or use these existing accounts:</p>
+        <div class="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors duration-300">
+          <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Demo Credentials</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Or use these existing accounts:</p>
           <div class="space-y-2 text-sm">
             <div class="flex items-center gap-2">
-              <span class="text-gray-600"><strong>Email:</strong> ahmed@aiesec.org</span>
+              <span class="text-gray-600 dark:text-gray-400"><strong>Email:</strong> ahmed@aiesec.org</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-gray-600"><strong>Password:</strong> password123</span>
+              <span class="text-gray-600 dark:text-gray-400"><strong>Password:</strong> password123</span>
             </div>
           </div>
         </div>

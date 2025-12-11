@@ -12,41 +12,41 @@ import { takeUntil } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
-      <div class="bg-white shadow-sm border-b border-gray-200">
+      <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div class="max-w-4xl mx-auto px-4 py-6">
-          <h1 class="text-3xl font-bold text-gray-900">User Profile</h1>
-          <p class="text-gray-600 mt-2">Manage your account information</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">User Profile</h1>
+          <p class="text-gray-600 dark:text-gray-400 mt-2">Manage your account information</p>
         </div>
       </div>
 
       <!-- Main Content -->
       <div *ngIf="currentUser" class="max-w-4xl mx-auto px-4 py-8">
         <!-- Alert Messages -->
-        <div *ngIf="successMessage" class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
-          <p class="text-green-700 font-medium">{{ successMessage }}</p>
+        <div *ngIf="successMessage" class="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border-l-4 border-green-500 rounded-lg">
+          <p class="text-green-700 dark:text-green-400 font-medium">{{ successMessage }}</p>
         </div>
 
-        <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-          <p class="text-red-700 font-medium">{{ errorMessage }}</p>
+        <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 rounded-lg">
+          <p class="text-red-700 dark:text-red-400 font-medium">{{ errorMessage }}</p>
         </div>
 
         <!-- Profile Card -->
-        <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-8 transition-colors duration-300">
           <!-- Avatar and Basic Info -->
-          <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-200">
+          <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
             <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white text-4xl font-bold">
               {{ currentUser.fullName.charAt(0) }}{{ currentUser.fullName.split(' ')[1]?.charAt(0) }}
             </div>
             <div class="flex-1">
-              <h2 class="text-3xl font-bold text-gray-900">{{ currentUser.fullName }}</h2>
-              <p class="text-gray-600 mt-1">{{ currentUser.email }}</p>
+              <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ currentUser.fullName }}</h2>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">{{ currentUser.email }}</p>
               <div class="flex gap-4 mt-4">
-                <span class="px-3 py-1 bg-blue-100 text-blue-800 font-semibold text-sm rounded-full">
+                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 font-semibold text-sm rounded-full">
                   {{ currentUser.department }}
                 </span>
-                <span class="px-3 py-1 bg-indigo-100 text-indigo-800 font-semibold text-sm rounded-full">
+                <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-300 font-semibold text-sm rounded-full">
                   {{ currentUser.role }}
                 </span>
               </div>
@@ -55,49 +55,49 @@ import { takeUntil } from 'rxjs/operators';
 
           <!-- Profile Information -->
           <div class="mb-8">
-            <h3 class="text-lg font-bold text-gray-900 mb-6">Account Information</h3>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">Account Information</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Full Name -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
                 <input
                   type="text"
                   [(ngModel)]="editedUser.fullName"
                   [disabled]="!isEditMode"
-                  class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-50 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
+                  class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
                 />
               </div>
 
               <!-- Email -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
                 <input
                   type="email"
                   [(ngModel)]="editedUser.email"
                   [disabled]="!isEditMode"
-                  class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-50 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
+                  class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
                 />
               </div>
 
               <!-- Department -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Department</label>
                 <input
                   type="text"
                   [(ngModel)]="editedUser.department"
                   [disabled]="!isEditMode"
-                  class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-50 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
+                  class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
                 />
               </div>
 
               <!-- Role -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
                 <input
                   type="text"
                   [(ngModel)]="editedUser.role"
                   [disabled]="!isEditMode"
-                  class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-50 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
+                  class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
                 />
               </div>
             </div>
@@ -105,22 +105,22 @@ import { takeUntil } from 'rxjs/operators';
 
           <!-- Bio Section -->
           <div class="mb-8">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Bio</h3>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Bio</h3>
             <textarea
               [(ngModel)]="editedUser.bio"
               [disabled]="!isEditMode"
               rows="4"
-              class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-50 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
+              class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:cursor-not-allowed focus:outline-none focus:border-blue-500 transition"
               placeholder="Add a short bio about yourself..."
             ></textarea>
           </div>
 
           <!-- Edit/Save Buttons -->
-          <div class="flex gap-4 pt-8 border-t border-gray-200">
+          <div class="flex gap-4 pt-8 border-t border-gray-200 dark:border-gray-700">
             <button
               *ngIf="!isEditMode"
               (click)="startEdit()"
-              class="flex-1 px-6 py-3 bg-blue-50 text-blue-600 font-semibold rounded-lg hover:bg-blue-100 transition"
+              class="flex-1 px-6 py-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition"
             >
               Edit Profile
             </button>
@@ -135,7 +135,7 @@ import { takeUntil } from 'rxjs/operators';
             <button
               *ngIf="isEditMode"
               (click)="cancelEdit()"
-              class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition"
+              class="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
             >
               Cancel
             </button>
@@ -143,29 +143,29 @@ import { takeUntil } from 'rxjs/operators';
         </div>
 
         <!-- Security Section -->
-        <div class="bg-white rounded-lg shadow-md p-8 mb-8">
-          <h3 class="text-lg font-bold text-gray-900 mb-6">Security</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-8 transition-colors duration-300">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">Security</h3>
           <div class="space-y-4">
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div>
-                <p class="font-semibold text-gray-900">Password</p>
-                <p class="text-gray-600 text-sm">Last changed 3 months ago</p>
+                <p class="font-semibold text-gray-900 dark:text-white">Password</p>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">Last changed 3 months ago</p>
               </div>
               <button
                 disabled
-                class="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg cursor-not-allowed opacity-50"
+                class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-400 font-semibold rounded-lg cursor-not-allowed opacity-50"
               >
                 Change Password
               </button>
             </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div>
-                <p class="font-semibold text-gray-900">Two-Factor Authentication</p>
-                <p class="text-gray-600 text-sm">Not enabled</p>
+                <p class="font-semibold text-gray-900 dark:text-white">Two-Factor Authentication</p>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">Not enabled</p>
               </div>
               <button
                 disabled
-                class="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg cursor-not-allowed opacity-50"
+                class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-400 font-semibold rounded-lg cursor-not-allowed opacity-50"
               >
                 Enable
               </button>
@@ -205,9 +205,9 @@ import { takeUntil } from 'rxjs/operators';
 
       <!-- Not Found -->
       <div *ngIf="!currentUser && !isLoading" class="max-w-4xl mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow-md p-8 text-center">
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">Not logged in</h2>
-          <p class="text-gray-600 mb-4">Please log in to view your profile.</p>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center transition-colors duration-300">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Not logged in</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">Please log in to view your profile.</p>
           <a
             routerLink="/login"
             class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"

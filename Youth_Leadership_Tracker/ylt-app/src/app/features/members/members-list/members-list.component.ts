@@ -12,14 +12,14 @@ import { takeUntil } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
-      <div class="bg-white shadow-sm border-b border-gray-200">
+      <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 py-6">
           <div class="flex justify-between items-center">
             <div>
-              <h1 class="text-3xl font-bold text-gray-900">Members Management</h1>
-              <p class="text-gray-600 mt-2">Manage your AIESEC local committee members</p>
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Members Management</h1>
+              <p class="text-gray-600 dark:text-gray-400 mt-2">Manage your AIESEC local committee members</p>
             </div>
             <a 
               routerLink="/members/create"
@@ -34,27 +34,27 @@ import { takeUntil } from 'rxjs/operators';
       <!-- Main Content -->
       <div class="max-w-7xl mx-auto px-4 py-8">
         <!-- Search and Filter Bar -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6 transition-colors duration-300">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Search -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
               <input
                 type="text"
                 [(ngModel)]="searchQuery"
                 (input)="onSearch()"
                 placeholder="Search by name, email..."
-                class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition"
+                class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               />
             </div>
 
             <!-- Filter by Department -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Department</label>
               <select
                 [(ngModel)]="selectedDepartment"
                 (change)="onFilterChange()"
-                class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition"
+                class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
                 <option value="">All Departments</option>
                 <option value="TM">Team Member</option>
@@ -70,11 +70,11 @@ import { takeUntil } from 'rxjs/operators';
 
             <!-- Sort -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sort By</label>
               <select
                 [(ngModel)]="sortBy"
                 (change)="onSort()"
-                class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition"
+                class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
                 <option value="name">Name (A-Z)</option>
                 <option value="email">Email</option>
@@ -86,43 +86,43 @@ import { takeUntil } from 'rxjs/operators';
         </div>
 
         <!-- Results Count -->
-        <div class="mb-4 text-gray-700">
+        <div class="mb-4 text-gray-700 dark:text-gray-300">
           Showing <span class="font-semibold">{{ filteredMembers.length }}</span> of <span class="font-semibold">{{ allMembers.length }}</span> members
         </div>
 
         <!-- Members Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           @for (member of paginatedMembers; track member.id) {
-            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition p-6">
               <!-- Member Header -->
               <div class="mb-4">
                 <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white font-bold mb-3">
                   {{ member.fullName.charAt(0) }}{{ member.fullName.split(' ')[1]?.charAt(0) }}
                 </div>
-                <h3 class="text-xl font-bold text-gray-900">{{ member.fullName }}</h3>
-                <p class="text-gray-600 text-sm">{{ member.email }}</p>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ member.fullName }}</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">{{ member.email }}</p>
               </div>
 
               <!-- Member Info -->
-              <div class="space-y-3 mb-4 border-t border-gray-200 pt-4">
+              <div class="space-y-3 mb-4 border-t border-gray-200 dark:border-gray-700 pt-4">
                 <div class="flex justify-between items-center">
-                  <span class="text-gray-600 text-sm">Department:</span>
-                  <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full">
+                  <span class="text-gray-600 dark:text-gray-400 text-sm">Department:</span>
+                  <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-sm font-semibold rounded-full">
                     {{ member.department }}
                   </span>
                 </div>
                 <div *ngIf="member.age" class="flex justify-between items-center">
-                  <span class="text-gray-600 text-sm">Age:</span>
-                  <span class="font-semibold text-gray-900">{{ member.age }}</span>
+                  <span class="text-gray-600 dark:text-gray-400 text-sm">Age:</span>
+                  <span class="font-semibold text-gray-900 dark:text-white">{{ member.age }}</span>
                 </div>
               </div>
 
               <!-- Skills -->
               <div class="mb-4">
-                <label class="text-sm font-medium text-gray-700 block mb-2">Skills</label>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">Skills</label>
                 <div class="flex flex-wrap gap-2">
                   @for (skill of member.skills; track skill) {
-                    <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                    <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full">
                       {{ skill }}
                     </span>
                   }
@@ -130,22 +130,22 @@ import { takeUntil } from 'rxjs/operators';
               </div>
 
               <!-- Actions -->
-              <div class="flex gap-2 pt-4 border-t border-gray-200">
+              <div class="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <a
                   [routerLink]="['/members', member.id]"
-                  class="flex-1 px-4 py-2 bg-blue-50 text-blue-600 font-semibold rounded-lg hover:bg-blue-100 transition text-center"
+                  class="flex-1 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition text-center"
                 >
                   View
                 </a>
                 <a
                   [routerLink]="['/members', member.id, 'edit']"
-                  class="flex-1 px-4 py-2 bg-indigo-50 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-100 transition text-center"
+                  class="flex-1 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition text-center"
                 >
                   Edit
                 </a>
                 <button
                   (click)="deleteMember(member.id)"
-                  class="flex-1 px-4 py-2 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition"
+                  class="flex-1 px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-semibold rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition"
                 >
                   Delete
                 </button>
@@ -156,13 +156,13 @@ import { takeUntil } from 'rxjs/operators';
 
         <!-- Empty State -->
         <div *ngIf="filteredMembers.length === 0" class="text-center py-12">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M11 10h.01M7 10h.01M9 20h6"/>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">No members found</h3>
-          <p class="text-gray-600 mb-4">Try adjusting your search or filters</p>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No members found</h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search or filters</p>
           <a 
             routerLink="/members/create"
             class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
@@ -176,7 +176,7 @@ import { takeUntil } from 'rxjs/operators';
           <button
             (click)="previousPage()"
             [disabled]="currentPage === 1"
-            class="px-4 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
           >
             Previous
           </button>
@@ -187,7 +187,7 @@ import { takeUntil } from 'rxjs/operators';
               [class.bg-blue-500]="currentPage === page"
               [class.text-white]="currentPage === page"
               [class.border-blue-500]="currentPage === page"
-              class="px-3 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50"
+              class="px-3 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               {{ page }}
             </button>
@@ -196,7 +196,7 @@ import { takeUntil } from 'rxjs/operators';
           <button
             (click)="nextPage()"
             [disabled]="currentPage >= getTotalPages()"
-            class="px-4 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
           >
             Next
           </button>
