@@ -102,17 +102,6 @@ import { takeUntil } from 'rxjs/operators';
           </button>
         </form>
 
-        <!-- Demo Credentials -->
-        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-3">Demo Credentials:</p>
-          <div class="space-y-2 text-sm">
-            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Email:</span> ahmed@aiesec.org</p>
-            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Password:</span> password123</p>
-            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Email:</span> fatima@aiesec.org</p>
-            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Password:</span> password123</p>
-          </div>
-        </div>
-
         <!-- Sign Up Link -->
         <div class="mt-6 text-center">
           <p class="text-gray-600 dark:text-gray-400 text-sm">

@@ -197,6 +197,7 @@ export class ExperiencesService {
 
   constructor() {
     this.initializeExperiences();
+    this.setupStorageListener();
   }
 
   private initializeExperiences(): void {
@@ -205,6 +206,22 @@ export class ExperiencesService {
       this.experiencesSubject.next(this.mockExperiences);
       this.saveExperiencesToStorage(this.mockExperiences);
     }
+  }
+
+  // Listen for localStorage changes from other tabs or direct modifications
+  private setupStorageListener(): void {
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'ylt_experiences') {
+        const newExperiences = event.newValue ? JSON.parse(event.newValue) : [];
+        this.experiencesSubject.next(newExperiences);
+      }
+    });
+  }
+
+  // Method to force refresh from localStorage (useful for same-tab sync)
+  refreshFromStorage(): void {
+    const experiences = this.getExperiencesFromStorage();
+    this.experiencesSubject.next(experiences);
   }
 
   private getExperiencesFromStorage(): Experience[] {

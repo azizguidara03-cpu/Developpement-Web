@@ -26,9 +26,10 @@ export class AuthService {
   private readonly LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutes
 
   // Mock users database with roles
+  // IMPORTANT: User IDs should match Member IDs for experiences to link correctly
   private mockUsers = [
     {
-      id: 1,
+      id: 100, // Admin - separate from members
       fullName: 'Admin User',
       email: 'admin@aiesec.org',
       password: 'password123',
@@ -36,28 +37,84 @@ export class AuthService {
       userRole: 'admin' as UserRole
     },
     {
-      id: 2,
-      fullName: 'Ahmed VP',
+      id: 1, // Matches member "Ahmed Ben Ali" (id=1)
+      fullName: 'Ahmed Ben Ali',
       email: 'ahmed@aiesec.org',
       password: 'password123',
       department: 'OGV',
       userRole: 'vp' as UserRole
     },
     {
-      id: 3,
-      fullName: 'Fatima TL',
+      id: 2, // Matches member "Fatima Zahra" (id=2)
+      fullName: 'Fatima Zahra',
       email: 'fatima@aiesec.org',
       password: 'password123',
-      department: 'IGT',
+      department: 'OGV',
       userRole: 'tl' as UserRole
     },
     {
-      id: 4,
-      fullName: 'Ali Member',
-      email: 'ali@aiesec.org',
+      id: 3,
+      fullName: 'Omar Khaled',
+      email: 'omar@aiesec.org',
+      password: 'password123',
+      department: 'OGV',
+      userRole: 'member' as UserRole
+    },
+    {
+      id: 4, // Matches member "Noor Hassan" (id=4)
+      fullName: 'Noor Hassan',
+      email: 'noor@aiesec.org',
+      password: 'password123',
+      department: 'IGV',
+      userRole: 'member' as UserRole
+    },
+    {
+      id: 5,
+      fullName: 'Sara Mohamed',
+      email: 'sara@aiesec.org',
+      password: 'password123',
+      department: 'IGV',
+      userRole: 'member' as UserRole
+    },
+    {
+      id: 6,
+      fullName: 'Youssef Mansour',
+      email: 'youssef@aiesec.org',
+      password: 'password123',
+      department: 'Talent Management',
+      userRole: 'tl' as UserRole
+    },
+    {
+      id: 7,
+      fullName: 'Leila Bouazizi',
+      email: 'leila@aiesec.org',
       password: 'password123',
       department: 'Marketing',
       userRole: 'member' as UserRole
+    },
+    {
+      id: 8,
+      fullName: 'Karim El Fassi',
+      email: 'karim@aiesec.org',
+      password: 'password123',
+      department: 'Finance',
+      userRole: 'vp' as UserRole
+    },
+    {
+      id: 9,
+      fullName: 'Amina Trabelsi',
+      email: 'amina@aiesec.org',
+      password: 'password123',
+      department: 'IGT',
+      userRole: 'member' as UserRole
+    },
+    {
+      id: 10,
+      fullName: 'Mehdi Gharbi',
+      email: 'mehdi@aiesec.org',
+      password: 'password123',
+      department: 'Information Management',
+      userRole: 'tl' as UserRole
     }
   ];
 
@@ -108,6 +165,144 @@ export class AuthService {
    */
   canManageMembers(): boolean {
     return this.hasRole('admin');
+  }
+
+  /**
+   * Register a new user with specific role and password
+   */
+  registerUser(user: User, password: string): Observable<User> {
+    return new Observable(observer => {
+      setTimeout(() => {
+        const users = this.getRegisteredUsersRaw();
+        
+        // check if email already exists
+        const emailExists = users.some((u: any) => u.email === user.email) || 
+                            this.mockUsers.some(u => u.email === user.email);
+        
+        if (emailExists) {
+          observer.error('Email already exists');
+          return;
+        }
+
+        const newUser = {
+          ...user,
+          password, // In a real app, this should be hashed
+          createdAt: new Date().toISOString()
+        };
+
+        users.push(newUser);
+        localStorage.setItem('ylt_users', JSON.stringify(users));
+        
+        observer.next(user);
+        observer.complete();
+      }, 500);
+    });
+  }
+
+  /**
+   * Get user by ID (checks both mock and registered users)
+   */
+  getUserById(id: number): Observable<User | null> {
+    return new Observable(observer => {
+      setTimeout(() => {
+        const idNum = typeof id === 'string' ? parseInt(id) : id;
+        
+        // Check mock users
+        const mockUser = this.mockUsers.find(u => u.id === idNum);
+        if (mockUser) {
+          observer.next({
+            id: mockUser.id,
+            fullName: mockUser.fullName,
+            email: mockUser.email,
+            department: mockUser.department,
+            userRole: mockUser.userRole
+          });
+          observer.complete();
+          return;
+        }
+        
+        // Check registered users
+        const users = this.getRegisteredUsersRaw();
+        const user = users.find((u: any) => u.id === idNum);
+        
+        if (user) {
+          observer.next({
+            id: user.id,
+            fullName: user.fullName,
+            email: user.email,
+            department: user.department,
+            userRole: user.userRole
+          });
+        } else {
+          observer.next(null);
+        }
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  /**
+   * Update user details (role and/or password)
+   */
+  updateUser(id: number, updates: { userRole?: UserRole, password?: string }): Observable<User | null> {
+    return new Observable(observer => {
+      setTimeout(() => {
+        const idNum = typeof id === 'string' ? parseInt(id) : id;
+        const users = this.getRegisteredUsersRaw();
+        const index = users.findIndex((u: any) => u.id === idNum);
+        
+        if (index !== -1) {
+          users[index] = {
+            ...users[index],
+            ...updates,
+            updatedAt: new Date().toISOString()
+          };
+          
+          // Don't update password if it's empty/undefined
+          if (!updates.password) {
+             delete (users[index] as any).password_update_temp; // Just ensuring no side effects
+             // Revert to old password implicitly by spreading ...users[index] first, 
+             // but updates only contains what we send. 
+             // Actually, if password IS passed, it updates. If not, it doesn't.
+             // We need to be careful not to overwrite password with undefined if it wasn't passed.
+             // The spread `...updates` handles this IF `updates` only contains keys we want to change.
+          }
+
+          localStorage.setItem('ylt_users', JSON.stringify(users));
+          
+          const updatedUser: User = {
+             id: users[index].id,
+             fullName: users[index].fullName,
+             email: users[index].email,
+             department: users[index].department,
+             userRole: users[index].userRole
+          };
+          
+          observer.next(updatedUser);
+        } else {
+          // Check if it's a mock user (cannot edit mock users persistently in this simple setup except in memory/session?)
+          // For now, let's say we can't edit mock users or we just return success without persistent change
+          // OR we could "promote" mock user to localStorage user.
+          // Let's just return null for mock users for now to keep it simple, or maybe pretend success.
+          // Better: Check mock users.
+          const mockIndex = this.mockUsers.findIndex(u => u.id === idNum);
+          if (mockIndex !== -1) {
+             // We can't easily persist changes to hardcoded mockUsers without copying them to localStorage scheme.
+             // For strict correctness in this mock env:
+             observer.error('Cannot edit default system accounts.');
+          } else {
+             observer.next(null); 
+          }
+        }
+        observer.complete();
+      }, 500);
+    });
+  }
+
+  // Helper to get raw users array from storage (including passwords)
+  private getRegisteredUsersRaw(): any[] {
+    const usersStr = localStorage.getItem('ylt_users');
+    return usersStr ? JSON.parse(usersStr) : [];
   }
 
   login(email: string, password: string): Observable<AuthResponse> {

@@ -115,6 +115,7 @@ export class MembersService {
 
   constructor() {
     this.initializeMembers();
+    this.setupStorageListener();
   }
 
   private initializeMembers(): void {
@@ -123,6 +124,22 @@ export class MembersService {
       this.membersSubject.next(this.mockMembers);
       this.saveMembersToStorage(this.mockMembers);
     }
+  }
+
+  // Listen for localStorage changes from other tabs or direct modifications
+  private setupStorageListener(): void {
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'ylt_members') {
+        const newMembers = event.newValue ? JSON.parse(event.newValue) : [];
+        this.membersSubject.next(newMembers);
+      }
+    });
+  }
+
+  // Method to force refresh from localStorage (useful for same-tab sync)
+  refreshFromStorage(): void {
+    const members = this.getMembersFromStorage();
+    this.membersSubject.next(members);
   }
 
   private getMembersFromStorage(): Member[] {

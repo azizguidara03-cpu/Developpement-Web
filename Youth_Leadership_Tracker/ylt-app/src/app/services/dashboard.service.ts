@@ -114,6 +114,10 @@ export class DashboardService {
   private authService = inject(AuthService);
 
   getDashboardStats(): Observable<DashboardStats> {
+    // Force refresh from localStorage to ensure we have the latest data
+    this.membersService.refreshFromStorage();
+    this.experiencesService.refreshFromStorage();
+    
     return combineLatest([
       this.membersService.getAllMembers(),
       this.experiencesService.getAllExperiences(),
@@ -132,6 +136,20 @@ export class DashboardService {
     activeExperiences: Experience[],
     completedExperiences: Experience[]
   ): DashboardStats {
+    // Get current user for personalized stats
+    const currentUser = this.authService.currentUser();
+    const currentUserId = currentUser?.id;
+    const currentUserName = currentUser?.fullName || 'User';
+    
+    // Filter experiences for the current user (for personalized stats)
+    const userExperiences = currentUserId 
+      ? experiences.filter(exp => exp.memberId === currentUserId) 
+      : [];
+    const userActiveExperiences = currentUserId
+      ? activeExperiences.filter(exp => exp.memberId === currentUserId)
+      : [];
+    
+    // Global stats (for charts - all members/experiences)
     const membersByDepartment = this.groupBy(members, 'department');
     const departmentStats = this.countByDepartment(experiences);
     const experiencesByDepartment = this.countByDepartment(experiences);
@@ -144,13 +162,10 @@ export class DashboardService {
     const membersByDepartmentChart = this.convertToChartData(membersByDepartment, DEPARTMENT_COLORS);
     const experiencesByRoleChart = this.convertToChartData(experiencesByRole, ROLE_COLORS);
     
-    // New: Timeline data
-    const timeline = this.createTimeline(experiences);
-    
-    // New: Leadership score
-    const currentUser = this.authService.currentUser();
-    const currentUserName = currentUser?.fullName || 'User';
-    const leadershipScore = this.calculateLeadershipScore(experiences, topSkills);
+    // Personalized stats (for current user only)
+    const timeline = this.createTimeline(userExperiences);
+    const userTopSkills = this.getTopSkills(userExperiences);
+    const leadershipScore = this.calculateLeadershipScore(userExperiences, userTopSkills);
 
     return {
       totalMembers: members.length,

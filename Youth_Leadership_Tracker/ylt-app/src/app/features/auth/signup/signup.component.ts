@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { MembersService } from '../../../services/members.service';
+import { User, UserRole } from '../../../models/auth';
+import { MemberFormData } from '../../../models/member';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-signup',
@@ -133,6 +136,21 @@ import { MembersService } from '../../../services/members.service';
               </p>
             </div>
 
+            <!-- Role (Optional - in a real app this might be hidden or approval-based) -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
+              <select
+                name="role"
+                [(ngModel)]="signupData.role"
+                class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
+              >
+                <option value="member">Member</option>
+                <option value="tl">Team Leader</option>
+                <option value="vp">Vice President</option>
+              </select>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Select your position in the committee</p>
+            </div>
+
             <!-- Sign Up Button -->
             <button
               type="submit"
@@ -154,19 +172,6 @@ import { MembersService } from '../../../services/members.service';
           </div>
         </div>
 
-        <!-- Info Box -->
-        <div class="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors duration-300">
-          <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Demo Credentials</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Or use these existing accounts:</p>
-          <div class="space-y-2 text-sm">
-            <div class="flex items-center gap-2">
-              <span class="text-gray-600 dark:text-gray-400"><strong>Email:</strong> ahmed@aiesec.org</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-gray-600 dark:text-gray-400"><strong>Password:</strong> password123</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   `,
@@ -182,7 +187,8 @@ export class SignupComponent implements OnInit {
     email: '',
     password: '',
     confirmPassword: '',
-    department: ''
+    department: '',
+    role: 'member'
   };
 
   isLoading = false;
@@ -217,80 +223,50 @@ export class SignupComponent implements OnInit {
 
     this.isLoading = true;
 
-    // Simulate signup process
-    setTimeout(() => {
-      // Check if email already exists
-      const existingUsers = localStorage.getItem('ylt_users');
-      let users = existingUsers ? JSON.parse(existingUsers) : [];
-
-      const emailExists = users.some((u: any) => u.email === this.signupData.email);
-      if (emailExists) {
-        this.errorMessage = 'This email is already registered. Please use a different email or login.';
-        this.isLoading = false;
-        return;
-      }
-
-      // Create new user
-      const newUser = {
-        id: Date.now(),
-        fullName: this.signupData.fullName,
-        email: this.signupData.email,
-        password: this.signupData.password,
-        department: this.signupData.department,
-        role: 'Team Member',
-        createdAt: new Date().toISOString()
-      };
-
-      // Save to users list
-      users.push(newUser);
-      localStorage.setItem('ylt_users', JSON.stringify(users));
-
-      // Also add user to members list
-      this.addUserToMembers(newUser);
-
-      // Automatically log in the user using auth service login method
-      this.authService.login(this.signupData.email, this.signupData.password)
-        .subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.successMessage = 'Account created and logged in successfully!';
-              setTimeout(() => {
-                this.isLoading = false;
-                this.router.navigate(['/dashboard']);
-              }, 1000);
-            }
-          },
-          error: () => {
-            this.errorMessage = 'Error during login. Please login manually.';
-            this.isLoading = false;
-          }
-        });
-    }, 1000);
-  }
-
-  private addUserToMembers(user: any): void {
-    const membersStr = localStorage.getItem('ylt_members');
-    const members = membersStr ? JSON.parse(membersStr) : [];
-
-    // Check if member already exists
-    const memberExists = members.some((m: any) => m.email === user.email);
-    if (memberExists) {
-      return;
-    }
-
-    // Create member object
-    const newMember = {
-      id: user.id,
-      fullName: user.fullName,
-      email: user.email,
-      department: user.department,
-      age: null,
-      skills: [],
-      createdAt: user.createdAt,
-      updatedAt: user.createdAt
+    // First create the member to get a proper ID
+    const memberData: MemberFormData = {
+      fullName: this.signupData.fullName,
+      email: this.signupData.email,
+      department: this.signupData.department,
+      skills: [] // Empty skills initially
     };
 
-    members.push(newMember);
-    localStorage.setItem('ylt_members', JSON.stringify(members));
-  }
+    this.membersService.createMember(memberData).pipe(
+      switchMap((newMember) => {
+        // Then register the user linked to that member
+        const newUser: User = {
+          id: newMember.id,
+          fullName: newMember.fullName,
+          email: newMember.email,
+          department: newMember.department,
+          userRole: this.signupData.role as UserRole
+        };
+        return this.authService.registerUser(newUser, this.signupData.password);
+      }),
+      // Finally login
+      switchMap(() => {
+        return this.authService.login(this.signupData.email, this.signupData.password);
+      })
+    ).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.successMessage = 'Account created and logged in successfully!';
+          setTimeout(() => {
+            this.isLoading = false;
+            this.router.navigate(['/dashboard']);
+          }, 1000);
+        } else {
+           // Should ideally not reach here if registerUser succeeds
+           this.errorMessage = response.message;
+           this.isLoading = false;
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = typeof err === 'string' ? err : 'Registration failed. Email might already be in use.';
+      }
+    });
+  } // End signup implementation (removing old logic)
+
+  // Removed private addUserToMembers as it is now handled by MembersService
 }

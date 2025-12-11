@@ -12,10 +12,10 @@ import { takeUntil } from 'rxjs/operators';
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-gray-800 dark:to-gray-900 text-white shadow-lg transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 py-8">
           <h1 class="text-4xl font-bold mb-2">Dashboard</h1>
-          <p class="text-blue-100">Youth Leadership Tracker Analytics & Statistics</p>
+          <p class="text-blue-100 dark:text-gray-400">Youth Leadership Tracker Analytics & Statistics</p>
         </div>
       </div>
 
@@ -395,9 +395,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedTimelineItem: TimelineItem | null = null;
 
   private destroy$ = new Subject<void>();
+  private storageListener: ((event: StorageEvent) => void) | null = null;
 
   ngOnInit(): void {
     this.loadDashboardStats();
+    this.setupStorageListener();
   }
 
   private loadDashboardStats(): void {
@@ -408,6 +410,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.memberDeptSegments = this.calculatePieSegments(stats.membersByDepartmentChart, stats.totalMembers);
         this.roleSegments = this.calculatePieSegments(stats.experiencesByRoleChart, stats.totalExperiences);
       });
+  }
+
+  // Listen for localStorage changes from other tabs or DevTools edits
+  private setupStorageListener(): void {
+    this.storageListener = (event: StorageEvent) => {
+      if (event.key === 'ylt_members' || event.key === 'ylt_experiences') {
+        // Reload dashboard stats when localStorage changes externally
+        this.loadDashboardStats();
+      }
+    };
+    window.addEventListener('storage', this.storageListener);
   }
 
   private calculatePieSegments(data: ChartData[], total: number): PieSegment[] {
@@ -444,6 +457,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    // Clean up storage listener
+    if (this.storageListener) {
+      window.removeEventListener('storage', this.storageListener);
+    }
   }
 }
 

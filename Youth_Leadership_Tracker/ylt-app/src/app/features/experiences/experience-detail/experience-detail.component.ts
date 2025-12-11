@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ExperiencesService } from '../../../services/experiences.service';
 import { MembersService } from '../../../services/members.service';
+import { AuthService } from '../../../services/auth.service';
 import { Experience } from '../../../models/experience';
 import { Member } from '../../../models/member';
 import { Subject } from 'rxjs';
@@ -13,41 +14,41 @@ import { takeUntil } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
-      <div class="bg-white shadow-sm border-b border-gray-200">
+      <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div class="max-w-4xl mx-auto px-4 py-6">
-          <a routerLink="/experiences" class="text-blue-600 hover:text-blue-700 font-semibold mb-2 inline-block">
+          <a routerLink="/experiences" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold mb-2 inline-block transition-colors">
             ← Back to Experiences
           </a>
-          <h1 class="text-3xl font-bold text-gray-900">Experience Details</h1>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Experience Details</h1>
         </div>
       </div>
 
       <!-- Main Content -->
       <div *ngIf="experience" class="max-w-4xl mx-auto px-4 py-8">
         <!-- Experience Card -->
-        <div class="bg-white rounded-lg shadow-md p-8 mb-8 border-l-4 border-blue-500">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-8 border-l-4 border-blue-500 transition-colors duration-300">
           <div class="flex items-start justify-between mb-6">
             <div>
               <div class="flex items-center gap-3 mb-3">
-                <h2 class="text-3xl font-bold text-gray-900">{{ experience.role }}</h2>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ experience.role }}</h2>
                 <span [ngClass]="getStatusBadgeClass()" class="px-4 py-2 text-sm font-semibold rounded-full">
                   {{ getExperienceStatus() }}
                 </span>
               </div>
-              <p class="text-gray-700 text-lg">{{ experience.description }}</p>
+              <p class="text-gray-700 dark:text-gray-300 text-lg">{{ experience.description }}</p>
             </div>
-            <div class="flex gap-2">
+            <div *ngIf="canEditExperiences()" class="flex gap-2">
               <a
                 [routerLink]="['/experiences', experience.id, 'edit']"
-                class="px-6 py-2 bg-indigo-50 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-100 transition"
+                class="px-6 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
               >
                 Edit
               </a>
               <button
                 (click)="deleteExperience()"
-                class="px-6 py-2 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition"
+                class="px-6 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-semibold rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition"
               >
                 Delete
               </button>
@@ -55,15 +56,15 @@ import { takeUntil } from 'rxjs/operators';
           </div>
 
           <!-- Key Information Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8 pt-8 border-t border-gray-200">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <!-- Member -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 mb-2">Member</label>
-              <p class="text-lg font-semibold text-gray-900">{{ memberName }}</p>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Member</label>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ memberName }}</p>
               <a
                 *ngIf="member"
                 [routerLink]="['/members', member.id]"
-                class="text-blue-600 hover:text-blue-700 text-sm mt-1 inline-block"
+                class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm mt-1 inline-block transition-colors"
               >
                 View Profile →
               </a>
@@ -71,38 +72,38 @@ import { takeUntil } from 'rxjs/operators';
 
             <!-- Role -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 mb-2">Role</label>
-              <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 font-semibold rounded-full text-sm">
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Role</label>
+              <span class="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 font-semibold rounded-full text-sm">
                 {{ experience.role }}
               </span>
             </div>
 
             <!-- Department -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 mb-2">Department</label>
-              <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 font-semibold rounded-full text-sm">
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Department</label>
+              <span class="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200 font-semibold rounded-full text-sm">
                 {{ experience.department }}
               </span>
             </div>
 
             <!-- Duration -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 mb-2">Duration</label>
-              <p class="text-sm text-gray-900">
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Duration</label>
+              <p class="text-sm text-gray-900 dark:text-white">
                 {{ getDuration() }}
               </p>
             </div>
           </div>
 
           <!-- Dates -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-200">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <div>
-              <label class="block text-sm font-medium text-gray-600 mb-2">Start Date</label>
-              <p class="text-lg font-semibold text-gray-900">{{ experience.startDate | date: 'MMMM dd, yyyy' }}</p>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Start Date</label>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ experience.startDate | date: 'MMMM dd, yyyy' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-600 mb-2">End Date</label>
-              <p class="text-lg font-semibold text-gray-900">
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">End Date</label>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ experience.endDate ? (experience.endDate | date: 'MMMM dd, yyyy') : 'Ongoing' }}
               </p>
             </div>
@@ -202,11 +203,15 @@ export class ExperienceDetailComponent implements OnInit, OnDestroy {
   private experiencesService = inject(ExperiencesService);
   private membersService = inject(MembersService);
   private activatedRoute = inject(ActivatedRoute);
+  private authService = inject(AuthService);
 
   experience: Experience | null = null;
   member: Member | null = null;
   memberName = 'Unknown';
   isLoading = true;
+
+  // Role-based access: admin, vp, tl can edit experiences
+  canEditExperiences = computed(() => this.authService.hasAnyRole(['admin', 'vp', 'tl']));
 
   private destroy$ = new Subject<void>();
 
