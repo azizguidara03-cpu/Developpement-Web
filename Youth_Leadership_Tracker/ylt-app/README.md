@@ -97,11 +97,13 @@ The artifacts will be stored in the `dist/` directory.
 
 ## 📸 Screenshots
 
-*(Placeholder for future screenshots)*
-
-| Dashboard | Member Profile |
+| Dashboard (Dark Mode) | Dashboard (Light Mode) |
 |-----------|----------------|
-| ![Dashboard](https://via.placeholder.com/400x200?text=Dashboard+View) | ![Profile](https://via.placeholder.com/400x200?text=Profile+View) |
+| ![Dashboard Dark](docs/images/dashboard-overview.png) | ![Dashboard Light](docs/images/dashboard-light-mode.png) |
+
+| Members Management | Experiences Tracking | User Profile |
+|--------------------|----------------------|--------------|
+| ![Members](docs/images/members-management.png) | ![Experiences](docs/images/experiences-tracking.png) | ![Profile](docs/images/user-profile.png) |
 
 ## 🤝 Contributors
 
