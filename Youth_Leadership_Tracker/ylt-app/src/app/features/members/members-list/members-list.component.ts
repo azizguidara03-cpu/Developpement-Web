@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -222,6 +222,7 @@ export class MembersListComponent implements OnInit, OnDestroy {
   private membersService = inject(MembersService);
   private authService = inject(AuthService);
   public languageService = inject(LanguageService);
+  private cdr = inject(ChangeDetectorRef);
 
   // Role-based access control
   canManageMembers = this.authService.canManageMembers();
@@ -249,6 +250,7 @@ export class MembersListComponent implements OnInit, OnDestroy {
       .subscribe((members) => {
         this.allMembers = members;
         this.applyFiltersAndSort();
+        this.cdr.markForCheck(); // Ensure UI updates when data changes
       });
   }
 
@@ -272,20 +274,14 @@ export class MembersListComponent implements OnInit, OnDestroy {
 
     // Apply search
     if (this.searchQuery.trim()) {
-      this.membersService.searchMembers(this.searchQuery)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((result) => {
-          filtered = result;
-          this.applyDepartmentFilter(filtered);
-        });
-    } else {
-      this.applyDepartmentFilter(filtered);
+      const lowerQuery = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(m =>
+        m.fullName.toLowerCase().includes(lowerQuery) ||
+        m.email.toLowerCase().includes(lowerQuery) ||
+        m.department.toLowerCase().includes(lowerQuery)
+      );
     }
-  }
-
-  private applyDepartmentFilter(members: Member[]): void {
-    let filtered = members;
-
+    
     // Apply department filter
     if (this.selectedDepartment) {
       filtered = filtered.filter(m => m.department === this.selectedDepartment);
@@ -322,9 +318,11 @@ export class MembersListComponent implements OnInit, OnDestroy {
       this.membersService.deleteMember(id)
         .pipe(takeUntil(this.destroy$))
         .subscribe((success) => {
-          if (success) {
-            this.loadMembers();
+          if (!success) {
+            console.error('Failed to delete member');
+            alert('Failed to delete member. Please try again.');
           }
+          // No need to call loadMembers() - the subscription in ngOnInit will handle the update
         });
     }
   }

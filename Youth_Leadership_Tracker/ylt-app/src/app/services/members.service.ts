@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Member, MemberFormData } from '../models/member';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MembersService {
-  private membersSubject = new BehaviorSubject<Member[]>(this.getMembersFromStorage());
-  public members$ = this.membersSubject.asObservable();
+  private authService = inject(AuthService);
 
   // Diverse mock members with new AIESEC departments
   private mockMembers: Member[] = [
@@ -113,16 +113,27 @@ export class MembersService {
     }
   ];
 
+  private membersSubject: BehaviorSubject<Member[]>;
+  public members$: Observable<Member[]>;
+
   constructor() {
+    // Initialize subject in constructor to ensure mockMembers is available
+    this.membersSubject = new BehaviorSubject<Member[]>([]);
+    this.members$ = this.membersSubject.asObservable();
+    
+    // Defer initialization to ensure everything is ready
     this.initializeMembers();
     this.setupStorageListener();
   }
 
   private initializeMembers(): void {
     const storedMembers = this.getMembersFromStorage();
+    this.membersSubject.next(storedMembers);
+    
     if (storedMembers.length === 0) {
-      this.membersSubject.next(this.mockMembers);
-      this.saveMembersToStorage(this.mockMembers);
+      // If storage returned empty (and caused fallback to mock), we should save it?
+      // actually getMembersFromStorage already returns mock if empty/error
+      // so we just need to ensure consistent state
     }
   }
 
@@ -130,8 +141,16 @@ export class MembersService {
   private setupStorageListener(): void {
     window.addEventListener('storage', (event) => {
       if (event.key === 'ylt_members') {
-        const newMembers = event.newValue ? JSON.parse(event.newValue) : [];
-        this.membersSubject.next(newMembers);
+        try {
+          // Check for undefined string explicitly
+          if (event.newValue === 'undefined') {
+            return;
+          }
+          const newMembers = event.newValue ? JSON.parse(event.newValue) : [];
+          this.membersSubject.next(newMembers);
+        } catch (e) {
+          console.error('Error parsing members from storage listener', e);
+        }
       }
     });
   }
@@ -143,18 +162,24 @@ export class MembersService {
   }
 
   private getMembersFromStorage(): Member[] {
-    const stored = localStorage.getItem('ylt_members');
-    if (stored) {
-      // Parse stored data and convert date strings back to Date objects
-      const members = JSON.parse(stored);
-      return members.map((m: any) => ({
-        ...m,
-        createdAt: new Date(m.createdAt),
-        updatedAt: new Date(m.updatedAt)
-      }));
-    } else {
-      // No stored data - initialize with mock data and save to storage
-      this.saveMembersToStorage(this.mockMembers);
+    try {
+      const stored = localStorage.getItem('ylt_members');
+      if (stored && stored !== 'undefined') {
+        // Parse stored data and convert date strings back to Date objects
+        const members = JSON.parse(stored);
+        return members.map((m: any) => ({
+          ...m,
+          createdAt: new Date(m.createdAt),
+          updatedAt: new Date(m.updatedAt)
+        }));
+      } else {
+        // No stored data or it's undefined - initialize with mock data and save to storage
+        this.saveMembersToStorage(this.mockMembers);
+        return [...this.mockMembers];
+      }
+    } catch (e) {
+      console.error('Error parsing members from storage', e);
+      // Fallback to mock data on error
       return [...this.mockMembers];
     }
   }
@@ -211,6 +236,15 @@ export class MembersService {
           };
           this.membersSubject.next([...members]);
           this.saveMembersToStorage(members);
+
+          // SYNC WITH AUTH SERVICE
+          // Ensure login credentials (email) and user details are updated
+          this.authService.syncMemberUpdate(id, {
+            email: formData.email,
+            fullName: formData.fullName,
+            department: formData.department
+          });
+
           observer.next(members[index]);
         } else {
           observer.next(null);
@@ -224,14 +258,21 @@ export class MembersService {
     return new Observable(observer => {
       setTimeout(() => {
         const members = this.membersSubject.value;
-        const index = members.findIndex(m => m.id == id || m.id === parseInt(id.toString()));
+        // Use loose equality (==) to handle string/number mismatch, or explicit check
+        const idToCheck = typeof id === 'string' ? parseInt(id, 10) : id;
+        
+        // Check if member exists first
+        const exists = members.some(m => m.id === idToCheck || m.id == id);
 
-        if (index !== -1) {
-          members.splice(index, 1);
-          this.membersSubject.next([...members]);
-          this.saveMembersToStorage(members);
+        if (exists) {
+          // Immutable update: create new array via filter
+          const updatedMembers = members.filter(m => m.id !== idToCheck && m.id != id);
+          
+          this.membersSubject.next(updatedMembers);
+          this.saveMembersToStorage(updatedMembers);
           observer.next(true);
         } else {
+          console.warn(`Member with id ${id} not found for deletion`);
           observer.next(false);
         }
         observer.complete();

@@ -328,7 +328,27 @@ export class MemberFormComponent implements OnInit, OnDestroy {
       skills: this.memberForm.value.skills
     };
 
+    // Check for email uniqueness before proceeding
+    // We need to subscribe to get current members list for checking
+    this.membersService.getAllMembers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(members => {
+        const emailExists = members.some(m => m.email.toLowerCase() === formData.email.toLowerCase() && m.id !== this.memberId);
+        
+        if (emailExists) {
+          this.errorMessage = 'This email is already in use by another member.';
+          this.isLoading = false;
+          return;
+        }
+
+        // Proceed with update or create
+        this.executeSubmit(formData);
+      });
+  }
+
+  private executeSubmit(formData: MemberFormData): void {
     let operation$;
+
 
     if (this.isEditMode) {
       // Update Member AND User

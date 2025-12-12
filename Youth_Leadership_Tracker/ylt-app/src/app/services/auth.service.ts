@@ -23,7 +23,7 @@ export class AuthService {
   private loginAttemptsSubject = new BehaviorSubject<number>(0);
   private lockoutTimeSubject = new BehaviorSubject<number>(0);
   private readonly MAX_ATTEMPTS = 3;
-  private readonly LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly LOCKOUT_DURATION = 100 * 1000; // 100 seconds
 
   // Mock users database with roles
   // IMPORTANT: User IDs should match Member IDs for experiences to link correctly
@@ -245,8 +245,12 @@ export class AuthService {
    * Update current user's profile (name, email, department, bio)
    * Used by Profile page for user self-edits
    */
+  /**
+   * Update current user's profile (name, email, department, bio)
+   * Used by Profile page for user self-edits
+   */
   updateProfile(updatedUser: User): void {
-    // Update localStorage
+    // Update localStorage for current session
     localStorage.setItem('ylt_user', JSON.stringify(updatedUser));
     
     // Update the signal
@@ -255,10 +259,12 @@ export class AuthService {
     // Update the BehaviorSubject for observable-based subscribers
     this.currentUserSubject.next(updatedUser);
     
-    // Also update in the registered users list if user exists there
+    // Update in the registered users list (persistence)
     const users = this.getRegisteredUsersRaw();
     const index = users.findIndex((u: any) => u.id === updatedUser.id);
+    
     if (index !== -1) {
+      // Update existing registered user
       users[index] = {
         ...users[index],
         fullName: updatedUser.fullName,
@@ -267,6 +273,19 @@ export class AuthService {
         bio: updatedUser.bio
       };
       localStorage.setItem('ylt_users', JSON.stringify(users));
+    } else {
+      // User not in storage yet (is a Mock User being edited)
+      // We must add them to storage to persist changes
+      const mockUser = this.mockUsers.find(u => u.id === updatedUser.id);
+      if (mockUser) {
+         const newUserEntry = {
+             ...mockUser, // keep original password/id
+             ...updatedUser, // override editable fields
+             userRole: updatedUser.userRole // ensure role is kept
+         };
+         users.push(newUserEntry);
+         localStorage.setItem('ylt_users', JSON.stringify(users));
+      }
     }
   }
 
@@ -278,7 +297,16 @@ export class AuthService {
       setTimeout(() => {
         const idNum = typeof id === 'string' ? parseInt(id) : id;
         const users = this.getRegisteredUsersRaw();
-        const index = users.findIndex((u: any) => u.id === idNum);
+        let index = users.findIndex((u: any) => u.id === idNum);
+        
+        // If not in storage (Mock User), prompt it to storage first
+        if (index === -1) {
+           const mockUser = this.mockUsers.find(u => u.id === idNum);
+           if (mockUser) {
+             users.push({ ...mockUser });
+             index = users.length - 1;
+           }
+        }
         
         if (index !== -1) {
           users[index] = {
@@ -289,12 +317,10 @@ export class AuthService {
           
           // Don't update password if it's empty/undefined
           if (!updates.password) {
-             delete (users[index] as any).password_update_temp; // Just ensuring no side effects
-             // Revert to old password implicitly by spreading ...users[index] first, 
-             // but updates only contains what we send. 
-             // Actually, if password IS passed, it updates. If not, it doesn't.
-             // We need to be careful not to overwrite password with undefined if it wasn't passed.
-             // The spread `...updates` handles this IF `updates` only contains keys we want to change.
+             // ensure we don't accidentally set password to undefined if it existed
+             // spread handles this automatically if updates.password is missing from the object, 
+             // but if it's explicitly undefined/empty string we might want to be careful.
+             // The calling code usually constructs the object.
           }
 
           localStorage.setItem('ylt_users', JSON.stringify(users));
@@ -304,35 +330,59 @@ export class AuthService {
              fullName: users[index].fullName,
              email: users[index].email,
              department: users[index].department,
-             userRole: users[index].userRole
+             userRole: users[index].userRole,
+             bio: users[index].bio
           };
           
           observer.next(updatedUser);
         } else {
-          // Check if it's a mock user (cannot edit mock users persistently in this simple setup except in memory/session?)
-          // For now, let's say we can't edit mock users or we just return success without persistent change
-          // OR we could "promote" mock user to localStorage user.
-          // Let's just return null for mock users for now to keep it simple, or maybe pretend success.
-          // Better: Check mock users.
-          const mockIndex = this.mockUsers.findIndex(u => u.id === idNum);
-          if (mockIndex !== -1) {
-             // We can't easily persist changes to hardcoded mockUsers without copying them to localStorage scheme.
-             // For strict correctness in this mock env:
-             observer.error('Cannot edit default system accounts.');
-          } else {
-             observer.next(null); 
-          }
+           observer.next(null); 
         }
         observer.complete();
       }, 500);
     });
   }
 
-  // Helper to get raw users array from storage (including passwords)
-  private getRegisteredUsersRaw(): any[] {
-    const usersStr = localStorage.getItem('ylt_users');
-    return usersStr ? JSON.parse(usersStr) : [];
+  /**
+   * Sync member details updates (email, name, etc) to user storage
+   * Ensures login works with new email if changed by Admin
+   */
+  syncMemberUpdate(id: number, updates: { email?: string, fullName?: string, department?: string }): void {
+    const users = this.getRegisteredUsersRaw();
+    // handle string/number id mismatch
+    const idNum = typeof id === 'string' ? parseInt(id, 10) : id;
+    const index = users.findIndex((u: any) => u.id === idNum);
+
+    if (index !== -1) {
+      users[index] = { ...users[index], ...updates };
+      localStorage.setItem('ylt_users', JSON.stringify(users));
+      
+      // Update current user if it matches the one being edited
+      const currentUser = this._currentUser();
+      if (currentUser && currentUser.id === idNum) {
+          const updated = { ...currentUser, ...updates };
+          this._currentUser.set(updated);
+          this.currentUserSubject.next(updated);
+          localStorage.setItem('ylt_user', JSON.stringify(updated));
+      }
+    } else {
+        // If not in ylt_users, it might be a mock user being edited for the first time
+        // We should "promote" it to ylt_users so the login works with new credentials
+        const mockUser = this.mockUsers.find(u => u.id === idNum);
+        if (mockUser) {
+            const newUserEntry = {
+                ...mockUser,
+                ...updates,
+                // ensure we keep the password if not provided
+                password: mockUser.password 
+            };
+            users.push(newUserEntry);
+            localStorage.setItem('ylt_users', JSON.stringify(users));
+        }
+    }
   }
+
+
 
   login(email: string, password: string): Observable<AuthResponse> {
     return new Observable(observer => {
@@ -355,10 +405,14 @@ export class AuthService {
         }
 
         // Get all users (mock + registered)
-        const allUsers = [
-          ...this.mockUsers,
-          ...this.getRegisteredUsers()
-        ];
+        // MERGE STRATEGY: Registered users from storage override mock users
+        const userMap = new Map<number, any>();
+        this.mockUsers.forEach(u => userMap.set(u.id, u));
+        
+        const storedUsers = this.getRegisteredUsersRaw();
+        storedUsers.forEach(u => userMap.set(u.id, u));
+        
+        const allUsers = Array.from(userMap.values());
 
         // Verify credentials
         const user = allUsers.find(u => u.email === email && u.password === password);
@@ -374,7 +428,9 @@ export class AuthService {
             fullName: user.fullName,
             email: user.email,
             department: user.department,
-            userRole: (user.userRole as UserRole) || 'member'
+            userRole: (user.userRole as UserRole) || 'member',
+            bio: user.bio, // Preserve bio
+            profileImageUrl: user.profileImageUrl // Preserve image if any
           };
 
           localStorage.setItem('ylt_token', token);
@@ -404,7 +460,7 @@ export class AuthService {
             
             observer.next({
               success: false,
-              message: 'Account locked after 3 failed attempts. Try again in 5 minutes'
+              message: 'Account locked after 3 failed attempts. Try again in 100 seconds'
             });
           } else {
             observer.next({
@@ -447,14 +503,19 @@ export class AuthService {
   }
 
   private getUserFromStorage(): User | null {
-    const userStr = localStorage.getItem('ylt_user');
-    return userStr ? JSON.parse(userStr) : null;
+    try {
+      const userStr = localStorage.getItem('ylt_user');
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (e) {
+      console.error('Error parsing user from storage', e);
+      return null;
+    }
   }
 
   private checkLockoutStatus(): void {
     const lockoutTime = localStorage.getItem('ylt_lockout_time');
     if (lockoutTime) {
-      const lockoutExpiry = parseInt(lockoutTime);
+      const lockoutExpiry = parseInt(lockoutTime, 10);
       if (Date.now() < lockoutExpiry) {
         this.lockoutTimeSubject.next(lockoutExpiry);
       }
@@ -462,17 +523,26 @@ export class AuthService {
   }
 
   getLoginAttempts(): number {
-    return parseInt(localStorage.getItem('ylt_login_attempts') || '0');
+    const attempts = localStorage.getItem('ylt_login_attempts');
+    return attempts ? parseInt(attempts, 10) : 0;
   }
 
   private getRegisteredUsers(): any[] {
-    const usersStr = localStorage.getItem('ylt_users');
-    const users = usersStr ? JSON.parse(usersStr) : [];
-    // Ensure all registered users have a default role
-    return users.map((u: any) => ({
+    return this.getRegisteredUsersRaw().map((u: any) => ({
       ...u,
       userRole: u.userRole || 'member'
     }));
+  }
+
+  // Helper to get raw users array from storage (including passwords)
+  private getRegisteredUsersRaw(): any[] {
+    try {
+      const usersStr = localStorage.getItem('ylt_users');
+      return usersStr ? JSON.parse(usersStr) : [];
+    } catch (e) {
+      console.error('Error parsing registered users', e);
+      return [];
+    }
   }
 
   getLockoutTime$(): Observable<number> {

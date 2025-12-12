@@ -6,8 +6,8 @@ import { Experience, ExperienceFormData } from '../models/experience';
   providedIn: 'root'
 })
 export class ExperiencesService {
-  private experiencesSubject = new BehaviorSubject<Experience[]>(this.getExperiencesFromStorage());
-  public experiences$ = this.experiencesSubject.asObservable();
+  private experiencesSubject: BehaviorSubject<Experience[]>;
+  public experiences$: Observable<Experience[]>;
 
   // Diverse mock experiences with new roles and departments
   private mockExperiences: Experience[] = [
@@ -216,12 +216,16 @@ export class ExperiencesService {
   ];
 
   constructor() {
+    this.experiencesSubject = new BehaviorSubject<Experience[]>([]);
+    this.experiences$ = this.experiencesSubject.asObservable();
     this.initializeExperiences();
     this.setupStorageListener();
   }
 
   private initializeExperiences(): void {
     const storedExperiences = this.getExperiencesFromStorage();
+    this.experiencesSubject.next(storedExperiences);
+    
     if (storedExperiences.length === 0) {
       this.experiencesSubject.next(this.mockExperiences);
       this.saveExperiencesToStorage(this.mockExperiences);
@@ -232,8 +236,13 @@ export class ExperiencesService {
   private setupStorageListener(): void {
     window.addEventListener('storage', (event) => {
       if (event.key === 'ylt_experiences') {
-        const newExperiences = event.newValue ? JSON.parse(event.newValue) : [];
-        this.experiencesSubject.next(newExperiences);
+        try {
+          if (event.newValue === 'undefined') return;
+          const newExperiences = event.newValue ? JSON.parse(event.newValue) : [];
+          this.experiencesSubject.next(newExperiences);
+        } catch (e) {
+          console.error('Error parsing experiences from storage listener', e);
+        }
       }
     });
   }
@@ -245,20 +254,26 @@ export class ExperiencesService {
   }
 
   private getExperiencesFromStorage(): Experience[] {
-    const stored = localStorage.getItem('ylt_experiences');
-    if (stored) {
-      // Parse stored data and convert date strings back to Date objects
-      const experiences = JSON.parse(stored);
-      return experiences.map((e: any) => ({
-        ...e,
-        startDate: new Date(e.startDate),
-        endDate: e.endDate ? new Date(e.endDate) : null,
-        createdAt: new Date(e.createdAt),
-        updatedAt: new Date(e.updatedAt)
-      }));
-    } else {
-      // No stored data - initialize with mock data and save to storage
-      this.saveExperiencesToStorage(this.mockExperiences);
+    try {
+      const stored = localStorage.getItem('ylt_experiences');
+      if (stored && stored !== 'undefined') {
+        // Parse stored data and convert date strings back to Date objects
+        const experiences = JSON.parse(stored);
+        return experiences.map((e: any) => ({
+          ...e,
+          startDate: new Date(e.startDate),
+          endDate: e.endDate ? new Date(e.endDate) : null,
+          createdAt: new Date(e.createdAt),
+          updatedAt: new Date(e.updatedAt)
+        }));
+      } else {
+        // No stored data or it's undefined - initialize with mock data and save to storage
+        this.saveExperiencesToStorage(this.mockExperiences);
+        return [...this.mockExperiences];
+      }
+    } catch (e) {
+      console.error('Error parsing experiences from storage', e);
+      // Fallback to mock data on error
       return [...this.mockExperiences];
     }
   }
@@ -306,11 +321,12 @@ export class ExperiencesService {
     });
   }
 
-  updateExperience(id: number, formData: ExperienceFormData): Observable<Experience | null> {
+  updateExperience(id: number | string, formData: ExperienceFormData): Observable<Experience | null> {
     return new Observable(observer => {
       setTimeout(() => {
         const experiences = this.experiencesSubject.value;
-        const index = experiences.findIndex(e => e.id === id);
+        const numId = typeof id === 'string' ? parseInt(id, 10) : id;
+        const index = experiences.findIndex(e => e.id === numId || e.id === id);
 
         if (index !== -1) {
           experiences[index] = {

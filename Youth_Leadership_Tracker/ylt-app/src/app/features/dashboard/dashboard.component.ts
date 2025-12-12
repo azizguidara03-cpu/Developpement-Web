@@ -460,20 +460,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private calculateBadges(): void {
-    const user = JSON.parse(localStorage.getItem('ylt_user') || '{}');
-    if (!user.id) return;
+    try {
+      const userStr = localStorage.getItem('ylt_user');
+      const user = (userStr && userStr !== 'undefined') ? JSON.parse(userStr) : {};
+      
+      if (!user.id) return;
 
-    // We need the member ID associated with this user
-    // The members mock data is in 'ylt_members'
-    const allMembers = JSON.parse(localStorage.getItem('ylt_members') || '[]');
-    // Find member by matching email or just assuming ID mapping if 1:1. 
-    // Current setup: User ID 1 == Member ID 1.
-    const member = allMembers.find((m: any) => m.id === user.id);
-    
-    if (member) {
-      const allExperiences = JSON.parse(localStorage.getItem('ylt_experiences') || '[]');
-      const memberExperiences = allExperiences.filter((e: any) => e.memberId === member.id);
-      this.earnedBadges = this.gamificationService.getBadgesForMember(member, memberExperiences);
+      // We need the member ID associated with this user
+      // The members mock data is in 'ylt_members'
+      const membersStr = localStorage.getItem('ylt_members');
+      const allMembers = (membersStr && membersStr !== 'undefined') ? JSON.parse(membersStr) : [];
+      
+      // Find member by matching email or just assuming ID mapping if 1:1. 
+      // Current setup: User ID 1 == Member ID 1.
+      const member = allMembers.find((m: any) => m.id === user.id);
+      
+      if (member) {
+        const experiencesStr = localStorage.getItem('ylt_experiences');
+        const allExperiences = (experiencesStr && experiencesStr !== 'undefined') ? JSON.parse(experiencesStr) : [];
+        const memberExperiences = allExperiences.filter((e: any) => e.memberId === member.id);
+        this.earnedBadges = this.gamificationService.getBadgesForMember(member, memberExperiences);
+      }
+    } catch (e) {
+      console.error('Error calculating badges', e);
     }
   }
 

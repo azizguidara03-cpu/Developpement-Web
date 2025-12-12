@@ -308,7 +308,7 @@ export class ExperienceFormComponent implements OnInit, OnDestroy {
       .subscribe((params) => {
         if (params['id']) {
           this.isEditMode = true;
-          this.experienceId = params['id'];
+          this.experienceId = parseInt(params['id'], 10);
           this.loadExperienceData();
         } else {
           // Pre-fill memberId from query params if available
@@ -368,12 +368,19 @@ export class ExperienceFormComponent implements OnInit, OnDestroy {
       memberId: parseInt(formValue.memberId)
     };
 
-    const operation$ = this.isEditMode
-      ? this.experiencesService.updateExperience(this.experienceId!, formData)
+    const operation$ = this.isEditMode && this.experienceId
+      ? this.experiencesService.updateExperience(this.experienceId, formData)
       : this.experiencesService.createExperience(formData);
 
     operation$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        // finalize ensures checking works even if observable errors or completes
+        // We handle loading state in next/error explicitly for now to keep it clear, 
+        // but adding finalize is good practice. 
+        // However, standard Angular HttpClient observables complete.
+        // Our custom observable completes. 
+      )
       .subscribe({
         next: (result) => {
           this.isLoading = false;
@@ -384,9 +391,12 @@ export class ExperienceFormComponent implements OnInit, OnDestroy {
             setTimeout(() => {
               this.router.navigate(['/experiences', result.id]);
             }, 1500);
+          } else {
+            this.errorMessage = 'Failed to save experience. Please try again.';
           }
         },
-        error: () => {
+        error: (err) => {
+          console.error('Error saving experience:', err);
           this.isLoading = false;
           this.errorMessage = 'An error occurred. Please try again.';
         }

@@ -1,10 +1,8 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -123,6 +121,7 @@ import { takeUntil } from 'rxjs/operators';
 export class LoginComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   email = '';
   password = '';
@@ -133,89 +132,146 @@ export class LoginComponent implements OnInit, OnDestroy {
   isAccountLocked = false;
   lockoutCountdown = 0;
 
-  private destroy$ = new Subject<void>();
-  private countdownInterval: any;
+  private countdownInterval: any = null;
 
   ngOnInit(): void {
-    this.loginAttempts = this.authService.getLoginAttempts();
-    this.checkLockoutStatus();
+    this.checkLockoutStatusOnLoad();
+  }
+
+  private checkLockoutStatusOnLoad(): void {
+    const lockoutTime = localStorage.getItem('ylt_lockout_time');
+    if (lockoutTime) {
+      const lockoutExpiry = parseInt(lockoutTime, 10);
+      const remaining = Math.ceil((lockoutExpiry - Date.now()) / 1000);
+      
+      if (remaining > 0) {
+        this.isAccountLocked = true;
+        this.lockoutCountdown = remaining;
+        this.startCountdown(lockoutExpiry);
+      } else {
+        localStorage.removeItem('ylt_lockout_time');
+        localStorage.removeItem('ylt_login_attempts');
+        this.isAccountLocked = false;
+        this.loginAttempts = 0;
+      }
+    } else {
+      this.loginAttempts = parseInt(localStorage.getItem('ylt_login_attempts') || '0', 10);
+    }
+    this.cdr.detectChanges();
   }
 
   onLogin(form: NgForm): void {
-    if (form.invalid) {
+    if (form.invalid || this.isAccountLocked || this.isLoading) {
       return;
     }
 
+    // Set loading state
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
 
-    this.authService.login(this.email, this.password)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          this.isLoading = false;
+    // Subscribe to login
+    this.authService.login(this.email, this.password).subscribe({
+      next: (response) => {
+        // ALWAYS reset loading state first
+        this.isLoading = false;
 
-          if (response.success) {
-            this.successMessage = 'Login successful! Redirecting...';
-            setTimeout(() => {
-              this.router.navigate(['/dashboard']);
-            }, 1000);
-          } else {
-            this.errorMessage = response.message;
-            this.loginAttempts = this.authService.getLoginAttempts();
-
-            if (this.errorMessage.includes('locked')) {
+        if (response.success) {
+          this.successMessage = 'Login successful! Redirecting...';
+          this.loginAttempts = 0;
+          this.cdr.detectChanges();
+          
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']);
+          }, 1000);
+        } else {
+          this.errorMessage = response.message;
+          
+          // Read attempts directly from localStorage
+          this.loginAttempts = parseInt(localStorage.getItem('ylt_login_attempts') || '0', 10);
+          
+          // Check if account just got locked
+          const lockoutTime = localStorage.getItem('ylt_lockout_time');
+          if (lockoutTime) {
+            const lockoutExpiry = parseInt(lockoutTime, 10);
+            const remaining = Math.ceil((lockoutExpiry - Date.now()) / 1000);
+            
+            if (remaining > 0) {
               this.isAccountLocked = true;
-              this.checkLockoutStatus();
+              this.lockoutCountdown = remaining;
+              this.startCountdown(lockoutExpiry);
             }
-
-            this.password = '';
           }
-        },
-        error: () => {
+
+          this.password = '';
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = 'An error occurred during login. Please try again.';
+        this.password = '';
+        this.cdr.detectChanges();
+      },
+      complete: () => {
+        // Ensure loading is reset even if complete fires before next
+        if (this.isLoading) {
           this.isLoading = false;
-          this.errorMessage = 'An error occurred during login. Please try again.';
+          this.cdr.detectChanges();
         }
-      });
+      }
+    });
   }
 
-  private checkLockoutStatus(): void {
-    this.authService.getLockoutTime$()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((lockoutTime) => {
-        if (lockoutTime > 0) {
-          this.isAccountLocked = true;
-          this.startCountdown(lockoutTime);
-        }
-      });
-  }
-
-  private startCountdown(lockoutTime: number): void {
+  private startCountdown(lockoutExpiry: number): void {
+    // Clear any existing interval
     if (this.countdownInterval) {
       clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
     }
 
+    // Immediately set the countdown value
+    this.lockoutCountdown = Math.max(0, Math.ceil((lockoutExpiry - Date.now()) / 1000));
+    this.cdr.detectChanges();
+
+    // Update every second
     this.countdownInterval = setInterval(() => {
-      const remaining = Math.ceil((lockoutTime - Date.now()) / 1000);
+      const remaining = Math.ceil((lockoutExpiry - Date.now()) / 1000);
       
       if (remaining <= 0) {
+        // Lockout expired
         clearInterval(this.countdownInterval);
+        this.countdownInterval = null;
+        
+        // Clear lockout state from storage
+        localStorage.removeItem('ylt_lockout_time');
+        localStorage.removeItem('ylt_login_attempts');
+        
+        // Reset component state
         this.isAccountLocked = false;
         this.loginAttempts = 0;
         this.lockoutCountdown = 0;
-        this.errorMessage = 'Account unlocked. You can try again.';
+        this.errorMessage = '';
+        this.successMessage = 'Account unlocked! You can try again.';
+        this.cdr.detectChanges();
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          this.successMessage = '';
+          this.cdr.detectChanges();
+        }, 3000);
       } else {
         this.lockoutCountdown = remaining;
+        this.cdr.detectChanges();
       }
     }, 1000);
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
     if (this.countdownInterval) {
       clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
     }
   }
 }
