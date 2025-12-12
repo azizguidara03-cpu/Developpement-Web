@@ -1,59 +1,112 @@
-# YltApp
+# Youth Leadership Tracker (YLT)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.2.
+<div align="center">
+  <h3>Manage AIESEC members, experiences, and leadership development.</h3>
+</div>
 
-## Development server
+## 📌 Overview
 
-To start a local development server, run:
+**Youth Leadership Tracker** is a modern web application designed to help youth organizations (specifically AIESEC) manage their membership base, track leadership experiences, and analyze organizational data.
+
+Built with **Angular**, it offers a responsive, fast, and intuitive interface for managing:
+- **Members**: Profiles, skills, and department allocations.
+- **Experiences**: Leadership roles, team experiences, and duration tracking.
+- **Analytics**: Real-time dashboard with key performance indicators.
+
+## ✨ Key Features
+
+- **🔐 Authentication & Security**
+  - Secure login with email validation.
+  - Account lockout mechanism after 3 failed attempts (security best practice).
+  - Role-based access control (RBAC).
+
+- **👥 Member Management**
+  - CRUD operations (Create, Read, Update, Delete) for members.
+  - Advanced search and filtering by department, name, and skills.
+  - Profile customization including bio, skills, and role.
+  - **Smart Sync**: Updating a member's email automatically updates their login credentials.
+
+- **🏆 Experience Tracking**
+  - Track leadership roles (Team Leader, VP, etc.).
+  - Department-specific experience logging.
+  - Status tracking (Active vs. Completed experiences).
+  - Skill acquisition tracking per experience.
+
+- **📊 Interactive Dashboard**
+  - Real-time statistics on membership growth.
+  - Visual charts for top skills and department distribution.
+  - Key metrics at a glance (Total Members, Active Roles, etc.).
+
+- **🌍 Internationalization (i18n)**
+  - Multi-language support (English / French / Arabic).
+  - Seamless language switching.
+
+- **💾 Data Persistence**
+  - LocalStorage-based data persistence for demo purposes.
+  - Data remains available across page reloads.
+
+## 🛠️ Technology Stack
+
+- **Framework**: [Angular 18+](https://angular.io/) (Standalone Components)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Charts**: [Ng2-Charts](https://valor-software.com/ng2-charts/) (Chart.js)
+- **Icons**: [Lucide Icons](https://lucide.dev/) (or similar SVG set)
+- **State Management**: RxJS (BehaviorSubjects)
+- **Build Tool**: Angular CLI
+
+## 🚀 Getting Started
+
+Follow these steps to set up the project locally.
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm (v9 or higher)
+- Angular CLI (`npm install -g @angular/cli`)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/youth-leadership-tracker.git
+   cd youth-leadership-tracker
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm start
+   # or
+   ng serve
+   ```
+
+4. **Access the application**
+   Open your browser and navigate to `http://localhost:4200`.
+
+### Building for Production
+
+To create an optimized build for deployment:
 
 ```bash
-ng serve
+npm run build
 ```
+The artifacts will be stored in the `dist/` directory.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 📸 Screenshots
 
-## Code scaffolding
+*(Placeholder for future screenshots)*
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+| Dashboard | Member Profile |
+|-----------|----------------|
+| ![Dashboard](https://via.placeholder.com/400x200?text=Dashboard+View) | ![Profile](https://via.placeholder.com/400x200?text=Profile+View) |
 
-```bash
-ng generate component component-name
-```
+## 🤝 Contributors
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+This project is developed and maintained by **Aziz Guidara**.
 
-```bash
-ng generate --help
-```
+## 📄 License
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+This project is licensed under the MIT License - see the LICENSE file for details.
