@@ -105,9 +105,31 @@ The artifacts will be stored in the `dist/` directory.
 |--------------------|----------------------|--------------|
 | ![Members](docs/images/members-management.png) | ![Experiences](docs/images/experiences-tracking.png) | ![Profile](docs/images/user-profile.png) |
 
+### � Authentication
+
+| Login Screen | Registration |
+|--------------|--------------|
+| ![Login](docs/images/login-screen.png) | ![Register](docs/images/register-screen.png) |
+
+### �📝 Forms & Management
+
+| Create Member | Edit Member |
+|---------------|-------------|
+| ![Create Member](docs/images/member-create.png) | ![Edit Member](docs/images/member-edit.png) |
+
+| Create Experience | Edit Experience |
+|-------------------|-----------------|
+| ![Create Experience](docs/images/experience-create.png) | ![Edit Experience](docs/images/experience-edit.png) |
+
+### 🌍 Localization (Spanish/Español)
+
+| Dashboard (ES) |
+|----------------|
+| ![Dashboard ES](docs/images/dashboard-es.png) |
+
 ## 🤝 Contributors
 
-This project is developed and maintained by **Aziz Guidara**.
+This project is developed and maintained by **Aziz Guidara** and **Zeineb Karoui**.
 
 ## 📄 License
 

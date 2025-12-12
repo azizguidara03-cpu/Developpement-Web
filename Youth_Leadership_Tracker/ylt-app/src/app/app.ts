@@ -72,15 +72,26 @@ import { takeUntil, filter } from 'rxjs/operators';
                   class="flex items-center gap-1 p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
                   aria-label="Change language"
                 >
+                  <img 
+                    [src]="'https://flagcdn.com/24x18/' + (languageService.currentLang() === 'en' ? 'gb' : languageService.currentLang()) + '.png'" 
+                    [alt]="languageService.currentLang()"
+                    class="w-5 h-3.5 object-cover rounded-sm mr-1"
+                  >
                   <span class="font-bold text-sm">{{ languageService.currentLang() | uppercase }}</span>
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
                 <div *ngIf="languageDropdownOpen" class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
-                  <button (click)="changeLanguage('en')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200" [class.font-bold]="languageService.currentLang() === 'en'">English</button>
-                  <button (click)="changeLanguage('fr')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200" [class.font-bold]="languageService.currentLang() === 'fr'">Français</button>
-                  <button (click)="changeLanguage('es')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200" [class.font-bold]="languageService.currentLang() === 'es'">Español</button>
+                  <button (click)="changeLanguage('en')" class="flex items-center w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200" [class.font-bold]="languageService.currentLang() === 'en'">
+                    <img src="https://flagcdn.com/24x18/gb.png" alt="English" class="w-5 h-3.5 object-cover rounded-sm mr-2"> English
+                  </button>
+                  <button (click)="changeLanguage('fr')" class="flex items-center w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200" [class.font-bold]="languageService.currentLang() === 'fr'">
+                    <img src="https://flagcdn.com/24x18/fr.png" alt="Français" class="w-5 h-3.5 object-cover rounded-sm mr-2"> Français
+                  </button>
+                  <button (click)="changeLanguage('es')" class="flex items-center w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200" [class.font-bold]="languageService.currentLang() === 'es'">
+                    <img src="https://flagcdn.com/24x18/es.png" alt="Español" class="w-5 h-3.5 object-cover rounded-sm mr-2"> Español
+                  </button>
                 </div>
               </div>
 
