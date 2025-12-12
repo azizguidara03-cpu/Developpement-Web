@@ -47,12 +47,13 @@ Built with **Angular**, it offers a responsive, fast, and intuitive interface fo
 
 ## 🛠️ Technology Stack
 
-- **Framework**: [Angular 18+](https://angular.io/) (Standalone Components)
+- **Framework**: [Angular 20+](https://angular.io/) (Standalone Components)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Charts**: [Ng2-Charts](https://valor-software.com/ng2-charts/) (Chart.js)
 - **Icons**: [Lucide Icons](https://lucide.dev/) (or similar SVG set)
 - **State Management**: RxJS (BehaviorSubjects)
 - **Build Tool**: Angular CLI
+- **AI Coding Assistant**: [Antigravity](https://deepmind.google/technologies/antigravity/)
 
 ## 🚀 Getting Started
 
