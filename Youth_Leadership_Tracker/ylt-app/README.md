@@ -111,6 +111,12 @@ The artifacts will be stored in the `dist/` directory.
 |--------------|--------------|
 | ![Login](docs/images/login-screen.png) | ![Register](docs/images/register-screen.png) |
 
+#### 🔒 Security Features (Error Handling & Lockout)
+
+| Invalid Credentials | Account Lockout |
+|---------------------|-----------------|
+| ![Login Failed](docs/images/login-failed.png) | ![Account Locked](docs/images/login-locked.png) |
+
 ### �📝 Forms & Management
 
 | Create Member | Edit Member |
@@ -121,7 +127,7 @@ The artifacts will be stored in the `dist/` directory.
 |-------------------|-----------------|
 | ![Create Experience](docs/images/experience-create.png) | ![Edit Experience](docs/images/experience-edit.png) |
 
-### 🌍 Localization (Spanish/Español)
+### 🌍 Language Switching (Example: Spanish Dashboard)
 
 | Dashboard (ES) |
 |----------------|
@@ -129,7 +135,7 @@ The artifacts will be stored in the `dist/` directory.
 
 ## 🤝 Contributors
 
-This project is developed and maintained by **Aziz Guidara** and **Zeineb Karoui**.
+This project is developed and maintained by [**Aziz Guidara**](https://www.linkedin.com/in/aziz-guidara-082501278/) and [**Zeineb Karoui**](https://www.linkedin.com/in/zeineb-karoui-0738bb2a0/).
 
 ## 📄 License
 
