@@ -8,12 +8,13 @@ import { AuthService } from '../../../services/auth.service';
 import { Experience } from '../../../models/experience';
 import { Member } from '../../../models/member';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';import { TranslatePipe } from '../../../pipes/translate.pipe';
+import { LanguageService } from '../../../services/language.service';
 
 @Component({
   selector: 'app-experiences-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
@@ -21,15 +22,15 @@ import { takeUntil } from 'rxjs/operators';
         <div class="max-w-7xl mx-auto px-4 py-6">
           <div class="flex justify-between items-center">
             <div>
-              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Leadership Experiences</h1>
-              <p class="text-gray-600 dark:text-gray-400 mt-2">Manage member leadership experiences and roles</p>
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ 'leadership_experiences' | translate }}</h1>
+              <p class="text-gray-600 dark:text-gray-400 mt-2">{{ 'manage_experiences_desc' | translate }}</p>
             </div>
             <a 
               *ngIf="canEditExperiences"
               routerLink="/experiences/create"
               class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg transition"
             >
-              + Add Experience
+              + {{ 'add_experience' | translate }}
             </a>
           </div>
         </div>
@@ -42,69 +43,69 @@ import { takeUntil } from 'rxjs/operators';
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <!-- Search -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'search' | translate }}</label>
               <input
                 type="text"
                 [(ngModel)]="searchQuery"
                 (input)="onSearch()"
-                placeholder="Search by role, member..."
+                [placeholder]="'search_placeholder_experiences' | translate"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               />
             </div>
 
             <!-- Filter by Role -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'role' | translate }}</label>
               <select
                 [(ngModel)]="selectedRole"
                 (change)="onFilterChange()"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
-                <option value="">All Roles</option>
-                <option value="Team Member">Team Member</option>
-                <option value="Team Leader">Team Leader</option>
-                <option value="Vice President">Vice President</option>
-                <option value="Local Committee President">Local Committee President</option>
-                <option value="OC Member">OC Member</option>
-                <option value="OC Vice President">OC Vice President</option>
-                <option value="OC President">OC President</option>
-                <option value="Local Support Team">Local Support Team</option>
-                <option value="Entity Support Team">Entity Support Team</option>
+                <option value="">{{ 'all_roles' | translate }}</option>
+                <option value="Team Member">{{ 'team_member' | translate }}</option>
+                <option value="Team Leader">{{ 'team_leader' | translate }}</option>
+                <option value="Vice President">{{ 'vice_president' | translate }}</option>
+                <option value="Local Committee President">{{ 'local_committee_president' | translate }}</option>
+                <option value="OC Member">{{ 'oc_member' | translate }}</option>
+                <option value="OC Vice President">{{ 'oc_vice_president' | translate }}</option>
+                <option value="OC President">{{ 'oc_president' | translate }}</option>
+                <option value="Local Support Team">{{ 'local_support_team' | translate }}</option>
+                <option value="Entity Support Team">{{ 'entity_support_team' | translate }}</option>
               </select>
             </div>
 
             <!-- Filter by Department -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Department</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'department' | translate }}</label>
               <select
                 [(ngModel)]="selectedDepartment"
                 (change)="onFilterChange()"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
-                <option value="">All Departments</option>
-                <option value="IGV">IGV</option>
-                <option value="IGT">IGT</option>
-                <option value="OGV">OGV</option>
-                <option value="OGT">OGT</option>
-                <option value="Talent Management">Talent Management</option>
-                <option value="Finance">Finance</option>
-                <option value="Business Development">Business Development</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Information Management">Information Management</option>
+                <option value="">{{ 'all_departments' | translate }}</option>
+                <option value="IGV">{{ 'IGV' | translate }}</option>
+                <option value="IGT">{{ 'IGT' | translate }}</option>
+                <option value="OGV">{{ 'OGV' | translate }}</option>
+                <option value="OGT">{{ 'OGT' | translate }}</option>
+                <option value="Talent Management">{{ 'Talent Management' | translate }}</option>
+                <option value="Finance">{{ 'Finance' | translate }}</option>
+                <option value="Business Development">{{ 'Business Development' | translate }}</option>
+                <option value="Marketing">{{ 'Marketing' | translate }}</option>
+                <option value="Information Management">{{ 'Information Management' | translate }}</option>
               </select>
             </div>
 
             <!-- Filter by Status -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'status' | translate }}</label>
               <select
                 [(ngModel)]="selectedStatus"
                 (change)="onFilterChange()"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="completed">Completed</option>
+                <option value="">{{ 'all_status' | translate }}</option>
+                <option value="active">{{ 'active' | translate }}</option>
+                <option value="completed">{{ 'completed' | translate }}</option>
               </select>
             </div>
           </div>
@@ -112,7 +113,7 @@ import { takeUntil } from 'rxjs/operators';
 
         <!-- Results Count -->
         <div class="mb-4 text-gray-700 dark:text-gray-300">
-          Showing <span class="font-semibold">{{ filteredExperiences.length }}</span> of <span class="font-semibold">{{ allExperiences.length }}</span> experiences
+          {{ 'showing' | translate }} <span class="font-semibold">{{ filteredExperiences.length }}</span> {{ 'of' | translate }} <span class="font-semibold">{{ allExperiences.length }}</span> {{ 'experiences' | translate | lowercase }}
         </div>
 
         <!-- Experiences List -->
@@ -122,44 +123,44 @@ import { takeUntil } from 'rxjs/operators';
               <div class="flex justify-between items-start mb-4">
                 <div class="flex-1">
                   <div class="flex items-center gap-3 mb-2">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ experience.role }}</h3>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ experience.role | translate }}</h3>
                     <span [ngClass]="getStatusBadgeClass(experience)" class="px-3 py-1 text-xs font-semibold rounded-full">
-                      {{ getExperienceStatus(experience) }}
+                      {{ getExperienceStatus(experience) | translate }}
                     </span>
                   </div>
-                  <p class="text-gray-700 dark:text-gray-300">{{ experience.description }}</p>
+                  <p class="text-gray-700 dark:text-gray-300">{{ getCurrentDescription(experience) }}</p>
                 </div>
               </div>
 
               <!-- Experience Details -->
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 py-4 border-y border-gray-200 dark:border-gray-700">
                 <div>
-                  <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Member</label>
+                  <label class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ 'members' | translate }}</label>
                   <p class="text-gray-900 dark:text-white font-semibold">{{ getMemberName(experience.memberId) }}</p>
                 </div>
                 <div>
-                  <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Department</label>
+                  <label class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ 'department' | translate }}</label>
                   <span class="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-sm font-semibold rounded-full">
-                    {{ experience.department }}
+                    {{ experience.department | translate }}
                   </span>
                 </div>
                 <div>
-                  <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Start Date</label>
+                  <label class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ 'start_date' | translate }}</label>
                   <p class="text-gray-900 dark:text-white">{{ experience.startDate | date: 'MMM dd, yyyy' }}</p>
                 </div>
                 <div>
-                  <label class="text-xs font-medium text-gray-600 dark:text-gray-400">End Date</label>
-                  <p class="text-gray-900 dark:text-white">{{ experience.endDate ? (experience.endDate | date: 'MMM dd, yyyy') : 'Ongoing' }}</p>
+                  <label class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ 'end_date' | translate }}</label>
+                  <p class="text-gray-900 dark:text-white">{{ experience.endDate ? (experience.endDate | date: 'MMM dd, yyyy') : ('current' | translate) }}</p>
                 </div>
               </div>
 
               <!-- Skills -->
               <div class="mb-4">
-                <label class="text-xs font-medium text-gray-600 dark:text-gray-400 block mb-2">Skills Gained</label>
+                <label class="text-xs font-medium text-gray-600 dark:text-gray-400 block mb-2">{{ 'skills_gained' | translate }}</label>
                 <div class="flex flex-wrap gap-2">
                   @for (skill of experience.skillsGained; track skill) {
                     <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full">
-                      {{ skill }}
+                      {{ skill | translate }}
                     </span>
                   }
                 </div>
@@ -171,21 +172,21 @@ import { takeUntil } from 'rxjs/operators';
                   [routerLink]="['/experiences', experience.id]"
                   class="flex-1 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition text-center"
                 >
-                  View Details
+                  {{ 'view_details' | translate }}
                 </a>
                 <a
                   *ngIf="canEditExperiences"
                   [routerLink]="['/experiences', experience.id, 'edit']"
                   class="flex-1 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition text-center"
                 >
-                  Edit
+                  {{ 'edit' | translate }}
                 </a>
                 <button
                   *ngIf="canEditExperiences"
                   (click)="deleteExperience(experience.id)"
                   class="flex-1 px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-semibold rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition"
                 >
-                  Delete
+                  {{ 'delete' | translate }}
                 </button>
               </div>
             </div>
@@ -199,13 +200,13 @@ import { takeUntil } from 'rxjs/operators';
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No experiences found</h3>
-          <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search or filters</p>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ 'no_experiences_found' | translate }}</h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">{{ 'try_adjusting' | translate }}</p>
           <a 
             routerLink="/experiences/create"
             class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
           >
-            Create First Experience
+            {{ 'create_first_experience' | translate }}
           </a>
         </div>
 
@@ -216,7 +217,7 @@ import { takeUntil } from 'rxjs/operators';
             [disabled]="currentPage === 1"
             class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
           >
-            Previous
+            {{ 'previous' | translate }}
           </button>
           
           @for (page of getPageNumbers(); track page) {
@@ -236,7 +237,7 @@ import { takeUntil } from 'rxjs/operators';
             [disabled]="currentPage >= getTotalPages()"
             class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
           >
-            Next
+            {{ 'next' | translate }}
           </button>
         </div>
       </div>
@@ -252,6 +253,7 @@ export class ExperiencesListComponent implements OnInit, OnDestroy {
   private experiencesService = inject(ExperiencesService);
   private membersService = inject(MembersService);
   private authService = inject(AuthService);
+  public languageService = inject(LanguageService); // Added
 
   // Role-based access control
   canEditExperiences = this.authService.canEditExperiences();
@@ -388,14 +390,21 @@ export class ExperiencesListComponent implements OnInit, OnDestroy {
     return this.memberMap.get(memberId) || 'Unknown';
   }
 
+  getCurrentDescription(exp: Experience): string {
+    const lang = this.languageService.currentLang();
+    if (lang === 'fr' && exp.description_fr) return exp.description_fr;
+    if (lang === 'es' && exp.description_es) return exp.description_es;
+    return exp.description;
+  }
+
   getExperienceStatus(experience: Experience): string {
     const now = new Date();
     if (new Date(experience.startDate) > now) {
-      return 'Upcoming';
+      return 'upcoming';
     } else if (!experience.endDate || new Date(experience.endDate) >= now) {
-      return 'Active';
+      return 'active';
     } else {
-      return 'Completed';
+      return 'completed';
     }
   }
 

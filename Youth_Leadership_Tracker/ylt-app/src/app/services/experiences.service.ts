@@ -17,6 +17,8 @@ export class ExperiencesService {
       role: 'Vice President',
       department: 'OGV',
       description: 'Leading the OGV department strategic initiatives and team management',
+      description_fr: 'Direction des initiatives stratégiques du département OGV et gestion d\'équipe',
+      description_es: 'Liderar las iniciativas estratégicas del departamento OGV y gestión del equipo',
       startDate: new Date('2024-06-01'),
       endDate: new Date('2025-05-31'),
       skillsGained: ['Leadership', 'Strategic Thinking', 'Decision Making'],
@@ -29,6 +31,8 @@ export class ExperiencesService {
       role: 'Team Leader',
       department: 'IGV',
       description: 'Managing incoming volunteer programs and team coordination',
+      description_fr: 'Gestion des programmes de volontaires entrants et coordination d\'équipe',
+      description_es: 'Gestión de programas de voluntarios entrantes y coordinación del equipo',
       startDate: new Date('2024-07-01'),
       endDate: new Date('2025-06-30'),
       skillsGained: ['Leadership', 'Communication', 'Project Management'],
@@ -41,6 +45,8 @@ export class ExperiencesService {
       role: 'Local Committee President',
       department: 'Talent Management',
       description: 'Overall leadership of the local committee operations',
+      description_fr: 'Direction générale des opérations du comité local',
+      description_es: 'Liderazgo general de las operaciones del comité local',
       startDate: new Date('2024-01-01'),
       endDate: new Date('2024-12-31'),
       skillsGained: ['Leadership', 'Strategic Thinking', 'Communication', 'Decision Making'],
@@ -53,6 +59,8 @@ export class ExperiencesService {
       role: 'Team Member',
       department: 'Marketing',
       description: 'Supporting marketing campaigns and social media management',
+      description_fr: 'Support des campagnes marketing et gestion des réseaux sociaux',
+      description_es: 'Apoyo a campañas de marketing y gestión de redes sociales',
       startDate: new Date('2024-09-01'),
       endDate: null as any,
       skillsGained: ['Creativity', 'Communication', 'Adaptability'],
@@ -65,6 +73,8 @@ export class ExperiencesService {
       role: 'OC Member',
       department: 'OGV',
       description: 'Organizing outgoing volunteer exchange events',
+      description_fr: 'Organisation d\'événements d\'échange de volontaires sortants',
+      description_es: 'Organización de eventos de intercambio de voluntarios salientes',
       startDate: new Date('2024-08-01'),
       endDate: new Date('2025-07-31'),
       skillsGained: ['Project Management', 'Teamwork', 'Problem Solving'],
@@ -78,6 +88,8 @@ export class ExperiencesService {
       role: 'Team Leader',
       department: 'OGV',
       description: 'Led outgoing volunteer recruitment campaigns',
+      description_fr: 'A dirigé les campagnes de recrutement de volontaires sortants',
+      description_es: 'Lideró campañas de reclutamiento de voluntarios salientes',
       startDate: new Date('2023-09-01'),
       endDate: new Date('2024-05-30'),
       skillsGained: ['Leadership', 'Communication', 'Time Management'],
@@ -90,6 +102,8 @@ export class ExperiencesService {
       role: 'Team Member',
       department: 'IGV',
       description: 'Participated in incoming volunteer hosting program',
+      description_fr: 'Participation au programme d\'accueil des volontaires entrants',
+      description_es: 'Participó en el programa de acogida de voluntarios entrantes',
       startDate: new Date('2024-01-15'),
       endDate: new Date('2024-06-15'),
       skillsGained: ['Teamwork', 'Adaptability', 'Communication'],
@@ -102,6 +116,8 @@ export class ExperiencesService {
       role: 'OC Vice President',
       department: 'IGT',
       description: 'Deputy leadership for incoming talent program',
+      description_fr: 'Direction adjointe du programme de talents entrants',
+      description_es: 'Liderazgo adjunto para el programa de talento entrante',
       startDate: new Date('2023-06-01'),
       endDate: new Date('2024-05-31'),
       skillsGained: ['Leadership', 'Strategic Thinking', 'Project Management'],
@@ -114,6 +130,8 @@ export class ExperiencesService {
       role: 'Team Member',
       department: 'Finance',
       description: 'Budget management and financial reporting support',
+      description_fr: 'Gestion budgétaire et support aux rapports financiers',
+      description_es: 'Gestión presupuestaria y apoyo a informes financieros',
       startDate: new Date('2024-02-01'),
       endDate: new Date('2024-08-31'),
       skillsGained: ['Problem Solving', 'Decision Making', 'Time Management'],
@@ -126,6 +144,8 @@ export class ExperiencesService {
       role: 'Local Support Team',
       department: 'Information Management',
       description: 'Technical support and system administration',
+      description_fr: 'Support technique et administration des systèmes',
+      description_es: 'Soporte técnico y administración de sistemas',
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-09-30'),
       skillsGained: ['Problem Solving', 'Creativity', 'Adaptability'],
@@ -226,7 +246,21 @@ export class ExperiencesService {
 
   private getExperiencesFromStorage(): Experience[] {
     const stored = localStorage.getItem('ylt_experiences');
-    return stored ? JSON.parse(stored) : [];
+    if (stored) {
+      // Parse stored data and convert date strings back to Date objects
+      const experiences = JSON.parse(stored);
+      return experiences.map((e: any) => ({
+        ...e,
+        startDate: new Date(e.startDate),
+        endDate: e.endDate ? new Date(e.endDate) : null,
+        createdAt: new Date(e.createdAt),
+        updatedAt: new Date(e.updatedAt)
+      }));
+    } else {
+      // No stored data - initialize with mock data and save to storage
+      this.saveExperiencesToStorage(this.mockExperiences);
+      return [...this.mockExperiences];
+    }
   }
 
   private saveExperiencesToStorage(experiences: Experience[]): void {

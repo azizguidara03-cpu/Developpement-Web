@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MembersService } from '../../../services/members.service';
+import { LanguageService } from '../../../services/language.service';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
 import { Member, MemberFormData } from '../../../models/member';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -15,7 +17,7 @@ import { of } from 'rxjs';
 @Component({
   selector: 'app-member-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe],
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
@@ -23,14 +25,14 @@ import { of } from 'rxjs';
         <div class="max-w-4xl mx-auto px-4 py-6">
           <div class="flex items-center gap-3 mb-2">
             <a routerLink="/members" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold">
-              ← Back to Members
+              ← {{ 'back_to_members' | translate }}
             </a>
           </div>
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-            {{ isEditMode ? 'Edit Member' : 'Create New Member' }}
+            {{ (isEditMode ? 'edit_member' : 'create_new_member') | translate }}
           </h1>
           <p class="text-gray-600 dark:text-gray-400 mt-2">
-            {{ isEditMode ? 'Update member information' : 'Add a new member to your committee' }}
+            {{ (isEditMode ? 'update_member_info' : 'add_new_member_desc') | translate }}
           </p>
         </div>
       </div>
@@ -52,64 +54,64 @@ import { of } from 'rxjs';
             <!-- Full Name -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Full Name <span class="text-red-500">*</span>
+                {{ 'full_name' | translate }} <span class="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 formControlName="fullName"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
-                placeholder="Enter full name"
+                [placeholder]="'enter_full_name' | translate"
               />
               <p *ngIf="isFieldInvalid('fullName')" class="text-red-500 dark:text-red-400 text-sm mt-1">
-                Full name is required
+                {{ 'full_name' | translate }} {{ 'required_field' | translate }}
               </p>
             </div>
 
             <!-- Email -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email <span class="text-red-500">*</span>
+                {{ 'email' | translate }} <span class="text-red-500">*</span>
               </label>
               <input
                 type="email"
                 formControlName="email"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
-                placeholder="your.email@aiesec.org"
+                [placeholder]="'email_placeholder' | translate"
               />
               <p *ngIf="isFieldInvalid('email')" class="text-red-500 dark:text-red-400 text-sm mt-1">
-                Valid email is required
+                {{ 'valid_email_required' | translate }}
               </p>
             </div>
 
             <!-- Department -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Department <span class="text-red-500">*</span>
+                {{ 'department' | translate }} <span class="text-red-500">*</span>
               </label>
               <select
                 formControlName="department"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
               >
-                <option value="">Select Department</option>
+                <option value="">{{ 'select_department' | translate }}</option>
                 <option *ngFor="let dept of departments" [value]="dept">
-                  {{ getDepartmentLabel(dept) }}
+                  {{ dept | translate }}
                 </option>
               </select>
               <p *ngIf="isFieldInvalid('department')" class="text-red-500 dark:text-red-400 text-sm mt-1">
-                Department is required
+                {{ 'department' | translate }} {{ 'required_field' | translate }}
               </p>
             </div>
 
             <!-- Age -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Age</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'age' | translate }}</label>
               <input
                 type="number"
                 formControlName="age"
                 min="18"
                 max="65"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
-                placeholder="Optional"
+                [placeholder]="'optional' | translate"
               />
             </div>
           </div>
@@ -117,39 +119,39 @@ import { of } from 'rxjs';
           <!-- User Account Setup (Always visible for admin to manage access) -->
           <div *ngIf="!isLoading" class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              {{ isEditMode ? 'Manage Access' : 'User Account Access' }}
+              {{ (isEditMode ? 'manage_access' : 'user_account_access') | translate }}
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Role -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  System Role <span class="text-red-500">*</span>
+                  {{ 'system_role' | translate }} <span class="text-red-500">*</span>
                 </label>
                 <select
                   formControlName="role"
                   class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
                 >
-                  <option value="member">Member</option>
-                  <option value="tl">Team Leader</option>
-                  <option value="vp">Vice President</option>
+                  <option value="member">{{ 'team_member' | translate }}</option>
+                  <option value="tl">{{ 'team_leader' | translate }}</option>
+                  <option value="vp">{{ 'vice_president' | translate }}</option>
                   <option value="admin">Admin</option>
                 </select>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Determines what they can access in the system</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ 'determine_access' | translate }}</p>
               </div>
 
               <!-- Password -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Login Password <span class="text-red-500">*</span>
+                  {{ 'login_password' | translate }} <span class="text-red-500">*</span>
                 </label>
                 <input
                   type="password"
                   formControlName="password"
                   class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
-                  [placeholder]="isEditMode ? 'Leave blank to keep current password' : 'Set login password'"
+                  [placeholder]="(isEditMode ? 'leave_blank_password' : 'set_login_password') | translate"
                 />
                 <p *ngIf="isFieldInvalid('password')" class="text-red-500 dark:text-red-400 text-sm mt-1">
-                  Password (min 6 chars) is required for new accounts
+                  {{ 'password_min_chars' | translate }}
                 </p>
               </div>
             </div>
@@ -158,7 +160,7 @@ import { of } from 'rxjs';
           <!-- Skills Selection -->
           <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-              Skills <span class="text-red-500">*</span>
+              {{ 'skills' | translate }} <span class="text-red-500">*</span>
             </label>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               @for (skill of skillsList; track skill) {
@@ -171,13 +173,13 @@ import { of } from 'rxjs';
                     class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 cursor-pointer"
                   />
                   <label [for]="'skill-' + skill" class="ml-3 text-gray-700 dark:text-gray-300 cursor-pointer">
-                    {{ skill }}
+                    {{ skill | translate }}
                   </label>
                 </div>
               }
             </div>
             <p *ngIf="isFieldInvalid('skills')" class="text-red-500 dark:text-red-400 text-sm mt-2">
-              Select at least one skill
+              {{ 'select_at_least_one_skill' | translate }}
             </p>
           </div>
 
@@ -200,15 +202,15 @@ import { of } from 'rxjs';
               class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span *ngIf="!isLoading">
-                {{ isEditMode ? 'Update Member' : 'Create Member' }}
+                {{ (isEditMode ? 'edit_member' : 'create_member') | translate }}
               </span>
-              <span *ngIf="isLoading">Processing...</span>
+              <span *ngIf="isLoading">{{ 'processing' | translate }}</span>
             </button>
             <a
               routerLink="/members"
               class="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-center"
             >
-              Cancel
+              {{ 'cancel' | translate }}
             </a>
           </div>
         </form>
@@ -227,6 +229,7 @@ export class MemberFormComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
+  languageService = inject(LanguageService);
 
   memberForm!: FormGroup;
   isEditMode = false;

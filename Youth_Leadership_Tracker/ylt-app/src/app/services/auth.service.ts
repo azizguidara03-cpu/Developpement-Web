@@ -242,6 +242,35 @@ export class AuthService {
   }
 
   /**
+   * Update current user's profile (name, email, department, bio)
+   * Used by Profile page for user self-edits
+   */
+  updateProfile(updatedUser: User): void {
+    // Update localStorage
+    localStorage.setItem('ylt_user', JSON.stringify(updatedUser));
+    
+    // Update the signal
+    this._currentUser.set(updatedUser);
+    
+    // Update the BehaviorSubject for observable-based subscribers
+    this.currentUserSubject.next(updatedUser);
+    
+    // Also update in the registered users list if user exists there
+    const users = this.getRegisteredUsersRaw();
+    const index = users.findIndex((u: any) => u.id === updatedUser.id);
+    if (index !== -1) {
+      users[index] = {
+        ...users[index],
+        fullName: updatedUser.fullName,
+        email: updatedUser.email,
+        department: updatedUser.department,
+        bio: updatedUser.bio
+      };
+      localStorage.setItem('ylt_users', JSON.stringify(users));
+    }
+  }
+
+  /**
    * Update user details (role and/or password)
    */
   updateUser(id: number, updates: { userRole?: UserRole, password?: string }): Observable<User | null> {

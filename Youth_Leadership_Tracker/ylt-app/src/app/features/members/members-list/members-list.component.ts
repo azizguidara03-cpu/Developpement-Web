@@ -8,10 +8,13 @@ import { Member } from '../../../models/member';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+import { LanguageService } from '../../../services/language.service';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
+
 @Component({
   selector: 'app-members-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
@@ -19,15 +22,15 @@ import { takeUntil } from 'rxjs/operators';
         <div class="max-w-7xl mx-auto px-4 py-6">
           <div class="flex justify-between items-center">
             <div>
-              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Members Management</h1>
-              <p class="text-gray-600 dark:text-gray-400 mt-2">Manage your AIESEC local committee members</p>
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ 'members_management' | translate }}</h1>
+              <p class="text-gray-600 dark:text-gray-400 mt-2">{{ 'manage_members_desc' | translate }}</p>
             </div>
             <a 
               *ngIf="canManageMembers"
               routerLink="/members/create"
               class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg transition"
             >
-              + Add New Member
+              + {{ 'add_member' | translate }}
             </a>
           </div>
         </div>
@@ -40,49 +43,49 @@ import { takeUntil } from 'rxjs/operators';
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Search -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'search' | translate }}</label>
               <input
                 type="text"
                 [(ngModel)]="searchQuery"
                 (input)="onSearch()"
-                placeholder="Search by name, email..."
+                [placeholder]="'search_placeholder_members' | translate"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               />
             </div>
 
             <!-- Filter by Department -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Department</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'department' | translate }}</label>
               <select
                 [(ngModel)]="selectedDepartment"
                 (change)="onFilterChange()"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
-                <option value="">All Departments</option>
-                <option value="IGV">IGV</option>
-                <option value="IGT">IGT</option>
-                <option value="OGV">OGV</option>
-                <option value="OGT">OGT</option>
-                <option value="Talent Management">Talent Management</option>
-                <option value="Finance">Finance</option>
-                <option value="Business Development">Business Development</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Information Management">Information Management</option>
+                <option value="">{{ 'all_departments' | translate }}</option>
+                <option value="IGV">{{ 'IGV' | translate }}</option>
+                <option value="IGT">{{ 'IGT' | translate }}</option>
+                <option value="OGV">{{ 'OGV' | translate }}</option>
+                <option value="OGT">{{ 'OGT' | translate }}</option>
+                <option value="Talent Management">{{ 'Talent Management' | translate }}</option>
+                <option value="Finance">{{ 'Finance' | translate }}</option>
+                <option value="Business Development">{{ 'Business Development' | translate }}</option>
+                <option value="Marketing">{{ 'Marketing' | translate }}</option>
+                <option value="Information Management">{{ 'Information Management' | translate }}</option>
               </select>
             </div>
 
             <!-- Sort -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sort By</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'sort_by' | translate }}</label>
               <select
                 [(ngModel)]="sortBy"
                 (change)="onSort()"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 transition"
               >
-                <option value="name">Name (A-Z)</option>
-                <option value="email">Email</option>
-                <option value="department">Department</option>
-                <option value="date">Latest First</option>
+                <option value="name">{{ 'name' | translate }} (A-Z)</option>
+                <option value="email">{{ 'email' | translate }}</option>
+                <option value="department">{{ 'department' | translate }}</option>
+                <option value="date">{{ 'latest_first' | translate }}</option>
               </select>
             </div>
           </div>
@@ -90,7 +93,7 @@ import { takeUntil } from 'rxjs/operators';
 
         <!-- Results Count -->
         <div class="mb-4 text-gray-700 dark:text-gray-300">
-          Showing <span class="font-semibold">{{ filteredMembers.length }}</span> of <span class="font-semibold">{{ allMembers.length }}</span> members
+          {{ 'showing' | translate }} <span class="font-semibold">{{ filteredMembers.length }}</span> {{ 'of' | translate }} <span class="font-semibold">{{ allMembers.length }}</span> {{ 'members' | translate | lowercase }}
         </div>
 
         <!-- Members Grid -->
@@ -109,9 +112,9 @@ import { takeUntil } from 'rxjs/operators';
               <!-- Member Info -->
               <div class="space-y-3 mb-4 border-t border-gray-200 dark:border-gray-700 pt-4">
                 <div class="flex justify-between items-center">
-                  <span class="text-gray-600 dark:text-gray-400 text-sm">Department:</span>
+                  <span class="text-gray-600 dark:text-gray-400 text-sm">{{ 'department' | translate }}:</span>
                   <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-sm font-semibold rounded-full">
-                    {{ member.department }}
+                    {{ member.department | translate }}
                   </span>
                 </div>
                 <div *ngIf="member.age" class="flex justify-between items-center">
@@ -122,7 +125,7 @@ import { takeUntil } from 'rxjs/operators';
 
               <!-- Skills -->
               <div class="mb-4">
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">Skills</label>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">{{ 'skills' | translate }}</label>
                 <div class="flex flex-wrap gap-2">
                   @for (skill of member.skills; track skill) {
                     <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full">
@@ -138,21 +141,21 @@ import { takeUntil } from 'rxjs/operators';
                   [routerLink]="['/members', member.id]"
                   class="flex-1 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition text-center"
                 >
-                  View
+                  {{ 'view_details' | translate }}
                 </a>
                 <a
                   *ngIf="canManageMembers"
                   [routerLink]="['/members', member.id, 'edit']"
                   class="flex-1 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition text-center"
                 >
-                  Edit
+                  {{ 'edit' | translate }}
                 </a>
                 <button
                   *ngIf="canManageMembers"
                   (click)="deleteMember(member.id)"
                   class="flex-1 px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-semibold rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition"
                 >
-                  Delete
+                  {{ 'delete' | translate }}
                 </button>
               </div>
             </div>
@@ -166,13 +169,13 @@ import { takeUntil } from 'rxjs/operators';
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M11 10h.01M7 10h.01M9 20h6"/>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No members found</h3>
-          <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search or filters</p>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ 'no_members_found' | translate }}</h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">{{ 'try_adjusting' | translate }}</p>
           <a 
             routerLink="/members/create"
             class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
           >
-            Create First Member
+            {{ 'create_first_member' | translate }}
           </a>
         </div>
 
@@ -183,7 +186,7 @@ import { takeUntil } from 'rxjs/operators';
             [disabled]="currentPage === 1"
             class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
           >
-            Previous
+            {{ 'previous' | translate }}
           </button>
           
           @for (page of getPageNumbers(); track page) {
@@ -203,7 +206,7 @@ import { takeUntil } from 'rxjs/operators';
             [disabled]="currentPage >= getTotalPages()"
             class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
           >
-            Next
+            {{ 'next' | translate }}
           </button>
         </div>
       </div>
@@ -218,6 +221,7 @@ import { takeUntil } from 'rxjs/operators';
 export class MembersListComponent implements OnInit, OnDestroy {
   private membersService = inject(MembersService);
   private authService = inject(AuthService);
+  public languageService = inject(LanguageService);
 
   // Role-based access control
   canManageMembers = this.authService.canManageMembers();

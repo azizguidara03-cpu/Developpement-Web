@@ -144,7 +144,19 @@ export class MembersService {
 
   private getMembersFromStorage(): Member[] {
     const stored = localStorage.getItem('ylt_members');
-    return stored ? JSON.parse(stored) : [];
+    if (stored) {
+      // Parse stored data and convert date strings back to Date objects
+      const members = JSON.parse(stored);
+      return members.map((m: any) => ({
+        ...m,
+        createdAt: new Date(m.createdAt),
+        updatedAt: new Date(m.updatedAt)
+      }));
+    } else {
+      // No stored data - initialize with mock data and save to storage
+      this.saveMembersToStorage(this.mockMembers);
+      return [...this.mockMembers];
+    }
   }
 
   private saveMembersToStorage(members: Member[]): void {

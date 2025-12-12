@@ -245,17 +245,17 @@ export class DashboardService {
     let message: string;
     
     if (score < 25) {
-      level = 'Emerging Leader';
-      message = 'is just starting their leadership journey. Keep growing!';
+      level = 'level_emerging';
+      message = 'msg_emerging';
     } else if (score < 50) {
-      level = 'Developing Leader';
-      message = 'is making great progress on their leadership path!';
+      level = 'level_developing';
+      message = 'msg_developing';
     } else if (score < 75) {
-      level = 'Established Leader';
-      message = 'has developed strong leadership capabilities!';
+      level = 'level_established';
+      message = 'msg_established';
     } else {
-      level = 'Senior Leader';
-      message = 'is an experienced leader with diverse skills!';
+      level = 'level_senior';
+      message = 'msg_senior';
     }
 
     return {

@@ -4,6 +4,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ExperiencesService } from '../../../services/experiences.service';
 import { MembersService } from '../../../services/members.service';
 import { AuthService } from '../../../services/auth.service';
+import { LanguageService } from '../../../services/language.service';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
 import { Experience } from '../../../models/experience';
 import { Member } from '../../../models/member';
 import { Subject } from 'rxjs';
@@ -12,16 +14,16 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-experience-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
       <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div class="max-w-4xl mx-auto px-4 py-6">
           <a routerLink="/experiences" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold mb-2 inline-block transition-colors">
-            ← Back to Experiences
+            ← {{ 'back' | translate }}
           </a>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Experience Details</h1>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ 'experience_details' | translate }}</h1>
         </div>
       </div>
 
@@ -32,25 +34,25 @@ import { takeUntil } from 'rxjs/operators';
           <div class="flex items-start justify-between mb-6">
             <div>
               <div class="flex items-center gap-3 mb-3">
-                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ experience.role }}</h2>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ experience.role | translate }}</h2>
                 <span [ngClass]="getStatusBadgeClass()" class="px-4 py-2 text-sm font-semibold rounded-full">
-                  {{ getExperienceStatus() }}
+                  {{ getExperienceStatus() | translate }}
                 </span>
               </div>
-              <p class="text-gray-700 dark:text-gray-300 text-lg">{{ experience.description }}</p>
+              <p class="text-gray-700 dark:text-gray-300 text-lg">{{ currentDescription() }}</p>
             </div>
             <div *ngIf="canEditExperiences()" class="flex gap-2">
               <a
                 [routerLink]="['/experiences', experience.id, 'edit']"
                 class="px-6 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
               >
-                Edit
+                {{ 'edit' | translate }}
               </a>
               <button
                 (click)="deleteExperience()"
                 class="px-6 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-semibold rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition"
               >
-                Delete
+                {{ 'delete' | translate }}
               </button>
             </div>
           </div>
@@ -59,36 +61,36 @@ import { takeUntil } from 'rxjs/operators';
           <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <!-- Member -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Member</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'members' | translate }}</label>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ memberName }}</p>
               <a
                 *ngIf="member"
                 [routerLink]="['/members', member.id]"
                 class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm mt-1 inline-block transition-colors"
               >
-                View Profile →
+                {{ 'view_details' | translate }} →
               </a>
             </div>
 
             <!-- Role -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Role</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'role' | translate }}</label>
               <span class="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 font-semibold rounded-full text-sm">
-                {{ experience.role }}
+                {{ experience.role | translate }}
               </span>
             </div>
 
             <!-- Department -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Department</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'department' | translate }}</label>
               <span class="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200 font-semibold rounded-full text-sm">
-                {{ experience.department }}
+                {{ experience.department | translate }}
               </span>
             </div>
 
             <!-- Duration -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Duration</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'avg_duration' | translate }}</label>
               <p class="text-sm text-gray-900 dark:text-white">
                 {{ getDuration() }}
               </p>
@@ -98,30 +100,30 @@ import { takeUntil } from 'rxjs/operators';
           <!-- Dates -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Start Date</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'start_date' | translate }}</label>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ experience.startDate | date: 'MMMM dd, yyyy' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">End Date</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'end_date' | translate }}</label>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ experience.endDate ? (experience.endDate | date: 'MMMM dd, yyyy') : 'Ongoing' }}
+                {{ experience.endDate ? (experience.endDate | date: 'MMMM dd, yyyy') : ('current' | translate) }}
               </p>
             </div>
           </div>
 
           <!-- Description -->
           <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Description</h3>
-            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ experience.description }}</p>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ 'description' | translate }}</h3>
+            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ currentDescription() }}</p>
           </div>
 
           <!-- Skills Gained -->
           <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Skills Gained</h3>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ 'skills_gained' | translate }}</h3>
             <div class="flex flex-wrap gap-3">
               @for (skill of experience.skillsGained; track skill) {
                 <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-medium transition-colors">
-                  {{ skill }}
+                  {{ skill | translate }}
                 </span>
               }
             </div>
@@ -129,41 +131,41 @@ import { takeUntil } from 'rxjs/operators';
 
           <!-- Metadata -->
           <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 flex gap-6 text-sm text-gray-600 dark:text-gray-400">
-            <span>Created: {{ experience.createdAt | date: 'MMM dd, yyyy HH:mm' }}</span>
-            <span>Last Updated: {{ experience.updatedAt | date: 'MMM dd, yyyy HH:mm' }}</span>
+            <span>{{ 'created' | translate }}: {{ experience.createdAt | date: 'MMM dd, yyyy HH:mm' }}</span>
+            <span>{{ 'last_updated' | translate }}: {{ experience.updatedAt | date: 'MMM dd, yyyy HH:mm' }}</span>
           </div>
         </div>
 
         <!-- Related Member Info -->
         <div *ngIf="member" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 transition-colors duration-300">
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Member Information</h3>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{ 'member_info' | translate }}</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Full Name</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'full_name' | translate }}</label>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ member.fullName }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Email</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'email' | translate }}</label>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ member.email }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Department</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'department' | translate }}</label>
               <span class="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 font-semibold rounded-full text-sm">
-                {{ member.department }}
+                {{ member.department | translate }}
               </span>
             </div>
             <div *ngIf="member.age">
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Age</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'age' | translate }}</label>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ member.age }}</p>
             </div>
           </div>
 
           <div class="mt-6">
-            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Skills</label>
+            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'skills' | translate }}</label>
             <div class="flex flex-wrap gap-2">
               @for (skill of member.skills; track skill) {
                 <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full transition-colors">
-                  {{ skill }}
+                  {{ skill | translate }}
                 </span>
               }
             </div>
@@ -173,7 +175,7 @@ import { takeUntil } from 'rxjs/operators';
             [routerLink]="['/members', member.id]"
             class="inline-block mt-6 px-6 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition"
           >
-            View Full Member Profile
+            {{ 'view_details' | translate }}
           </a>
         </div>
       </div>
@@ -187,7 +189,7 @@ import { takeUntil } from 'rxjs/operators';
             routerLink="/experiences"
             class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
           >
-            Back to Experiences
+            {{ 'back' | translate }}
           </a>
         </div>
       </div>
@@ -204,6 +206,7 @@ export class ExperienceDetailComponent implements OnInit, OnDestroy {
   private membersService = inject(MembersService);
   private activatedRoute = inject(ActivatedRoute);
   private authService = inject(AuthService);
+  public languageService = inject(LanguageService); // Public for access in template if needed, or just use computed
 
   experience: Experience | null = null;
   member: Member | null = null;
@@ -212,6 +215,17 @@ export class ExperienceDetailComponent implements OnInit, OnDestroy {
 
   // Role-based access: admin, vp, tl can edit experiences
   canEditExperiences = computed(() => this.authService.hasAnyRole(['admin', 'vp', 'tl']));
+
+  // Helper signal to get the description in the current language
+  currentDescription = computed(() => {
+    const lang = this.languageService.currentLang();
+    const exp = this.experience;
+    if (!exp) return '';
+
+    if (lang === 'fr' && exp.description_fr) return exp.description_fr;
+    if (lang === 'es' && exp.description_es) return exp.description_es;
+    return exp.description;
+  });
 
   private destroy$ = new Subject<void>();
 
@@ -252,22 +266,22 @@ export class ExperienceDetailComponent implements OnInit, OnDestroy {
     
     const now = new Date();
     if (new Date(this.experience.startDate) > now) {
-      return 'Upcoming';
+      return 'upcoming';
     } else if (!this.experience.endDate || new Date(this.experience.endDate) >= now) {
-      return 'Active';
+      return 'active';
     } else {
-      return 'Completed';
+      return 'completed';
     }
   }
 
   getStatusBadgeClass(): string {
     const status = this.getExperienceStatus();
     switch (status) {
-      case 'Active':
+      case 'active':
         return 'bg-green-100 text-green-800';
-      case 'Completed':
+      case 'completed':
         return 'bg-gray-100 text-gray-800';
-      case 'Upcoming':
+      case 'upcoming':
         return 'bg-yellow-100 text-yellow-800';
       default:
         return 'bg-gray-100 text-gray-800';

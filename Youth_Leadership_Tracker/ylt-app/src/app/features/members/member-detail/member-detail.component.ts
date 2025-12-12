@@ -4,6 +4,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MembersService } from '../../../services/members.service';
 import { ExperiencesService } from '../../../services/experiences.service';
 import { AuthService } from '../../../services/auth.service';
+import { LanguageService } from '../../../services/language.service';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
 import { Member } from '../../../models/member';
 import { Experience } from '../../../models/experience';
 import { Subject } from 'rxjs';
@@ -12,16 +14,16 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-member-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
       <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div class="max-w-4xl mx-auto px-4 py-6">
           <a routerLink="/members" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold mb-2 inline-block transition-colors">
-            ← Back to Members
+            ← {{ 'back_to_members' | translate }}
           </a>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Member Details</h1>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ 'member_details' | translate }}</h1>
         </div>
       </div>
 
@@ -44,13 +46,13 @@ import { takeUntil } from 'rxjs/operators';
                 [routerLink]="['/members', member.id, 'edit']"
                 class="px-6 py-2 bg-indigo-50 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-100 transition"
               >
-                Edit
+                {{ 'edit' | translate }}
               </a>
               <button
                 (click)="deleteMember()"
                 class="px-6 py-2 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition"
               >
-                Delete
+                {{ 'delete' | translate }}
               </button>
             </div>
           </div>
@@ -58,34 +60,34 @@ import { takeUntil } from 'rxjs/operators';
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <!-- Department -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Department</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'department' | translate }}</label>
               <div class="flex items-center gap-2">
                 <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 font-semibold rounded-full text-sm">
-                  {{ member.department }}
+                  {{ member.department | translate }}
                 </span>
               </div>
             </div>
 
             <!-- Age -->
             <div *ngIf="member.age">
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Age</label>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ member.age }} years old</p>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'age' | translate }}</label>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ member.age }} {{ 'years_old' | translate }}</p>
             </div>
 
             <!-- Joined Date -->
             <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Joined</label>
+              <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{{ 'joined' | translate }}</label>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ member.createdAt | date: 'MMM dd, yyyy' }}</p>
             </div>
           </div>
 
           <!-- Skills -->
           <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Skills</h3>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ 'skills' | translate }}</h3>
             <div class="flex flex-wrap gap-3">
               @for (skill of member.skills; track skill) {
                 <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-medium transition-colors">
-                  {{ skill }}
+                  {{ skill | translate }}
                 </span>
               }
             </div>
@@ -95,18 +97,18 @@ import { takeUntil } from 'rxjs/operators';
         <!-- Member Experiences -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 transition-colors duration-300">
           <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Leadership Experiences</h3>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ 'leadership_experiences' | translate }}</h3>
             <a
               routerLink="/experiences/create"
               [queryParams]="{ memberId: member.id }"
               class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
             >
-              + Add Experience
+              + {{ 'add_experience' | translate }}
             </a>
           </div>
 
           <div *ngIf="memberExperiences.length === 0" class="text-center py-8">
-            <p class="text-gray-600 dark:text-gray-400">No experiences yet</p>
+            <p class="text-gray-600 dark:text-gray-400">{{ 'no_experiences_yet' | translate }}</p>
           </div>
 
           <div *ngIf="memberExperiences.length > 0" class="space-y-4">
@@ -114,14 +116,14 @@ import { takeUntil } from 'rxjs/operators';
               <div class="border-l-4 border-blue-500 p-4 bg-gray-50 dark:bg-gray-700/50 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition border-y border-r border-gray-200 dark:border-gray-600">
                 <div class="flex justify-between items-start">
                   <div class="flex-1">
-                    <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ experience.role }}</h4>
-                    <p class="text-gray-600 dark:text-gray-300 mt-1">{{ experience.description }}</p>
+                    <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ experience.role | translate }}</h4>
+                    <p class="text-gray-600 dark:text-gray-300 mt-1">{{ getCurrentDescription(experience) }}</p>
                     <div class="flex items-center gap-4 mt-3">
                       <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-sm font-semibold rounded-full">
-                        {{ experience.department }}
+                        {{ experience.department | translate }}
                       </span>
                       <span class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ experience.startDate | date: 'MMM dd, yyyy' }} - {{ experience.endDate ? (experience.endDate | date: 'MMM dd, yyyy') : 'Ongoing' }}
+                        {{ experience.startDate | date: 'MMM dd, yyyy' }} - {{ experience.endDate ? (experience.endDate | date: 'MMM dd, yyyy') : ('ongoing' | translate) }}
                       </span>
                     </div>
                   </div>
@@ -129,7 +131,7 @@ import { takeUntil } from 'rxjs/operators';
                     [routerLink]="['/experiences', experience.id]"
                     class="px-3 py-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition-colors"
                   >
-                    View →
+                    {{ 'view' | translate }} →
                   </a>
                 </div>
               </div>
@@ -140,14 +142,14 @@ import { takeUntil } from 'rxjs/operators';
 
       <!-- Not Found -->
       <div *ngIf="!member && !isLoading" class="max-w-4xl mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow-md p-8 text-center">
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">Member not found</h2>
-          <p class="text-gray-600 mb-4">The member you're looking for doesn't exist.</p>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center transition-colors duration-300">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ 'member_not_found' | translate }}</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">{{ 'member_not_found_desc' | translate }}</p>
           <a
             routerLink="/members"
             class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
           >
-            Back to Members
+            {{ 'back_to_members' | translate }}
           </a>
         </div>
       </div>
@@ -164,6 +166,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   private experiencesService = inject(ExperiencesService);
   private activatedRoute = inject(ActivatedRoute);
   private authService = inject(AuthService);
+  languageService = inject(LanguageService);
 
   member: Member | null = null;
   memberExperiences: Experience[] = [];
@@ -205,8 +208,19 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+  getCurrentDescription(experience: Experience): string {
+    const lang = this.languageService.currentLang();
+    if (lang === 'fr' && (experience as any).description_fr) {
+      return (experience as any).description_fr;
+    } else if (lang === 'es' && (experience as any).description_es) {
+      return (experience as any).description_es;
+    }
+    return experience.description;
+  }
+
   deleteMember(): void {
-    if (this.member && confirm('Are you sure you want to delete this member? This action cannot be undone.')) {
+    const confirmMsg = this.languageService.translate('confirm_delete_member');
+    if (this.member && confirm(confirmMsg)) {
       this.membersService.deleteMember(this.member.id)
         .pipe(takeUntil(this.destroy$))
         .subscribe(() => {

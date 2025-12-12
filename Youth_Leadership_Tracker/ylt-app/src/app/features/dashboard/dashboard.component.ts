@@ -6,17 +6,19 @@ import { GamificationService, Badge } from '../../services/gamification.service'
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+import { TranslatePipe } from '../../pipes/translate.pipe';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
       <div class="bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-gray-800 dark:to-gray-900 text-white shadow-lg transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 py-8">
-          <h1 class="text-4xl font-bold mb-2">Dashboard</h1>
-          <p class="text-blue-100 dark:text-gray-400">Youth Leadership Tracker Analytics & Statistics</p>
+          <h1 class="text-4xl font-bold mb-2">{{ 'dashboard' | translate }}</h1>
+          <p class="text-blue-100 dark:text-gray-400">{{ 'dashboard_subtitle' | translate }}</p>
         </div>
       </div>
 
@@ -30,16 +32,16 @@ import { takeUntil } from 'rxjs/operators';
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
                 <span class="text-3xl">🏆</span>
-                <h2 class="text-2xl font-bold">{{ stats.leadershipScore.level }}</h2>
+                <h2 class="text-2xl font-bold">{{ stats.leadershipScore.level | translate }}</h2>
               </div>
               <p class="text-white/90 text-lg mb-4">
-                <span class="font-semibold">{{ stats.currentUserName }}</span> {{ stats.leadershipScore.message }}
+                <span class="font-semibold">{{ stats.currentUserName }}</span> {{ stats.leadershipScore.message | translate }}
               </p>
               
               <!-- Progress Bar -->
               <div class="relative">
                 <div class="flex justify-between text-sm text-white/80 mb-2">
-                  <span>Leadership Growth</span>
+                  <span>{{ 'leadership_growth' | translate }}</span>
                   <span class="font-bold">{{ stats.leadershipScore.score }}%</span>
                 </div>
                 <div class="h-4 bg-white/30 rounded-full overflow-hidden">
@@ -55,15 +57,15 @@ import { takeUntil } from 'rxjs/operators';
             <div class="grid grid-cols-3 gap-4 md:w-72">
               <div class="text-center bg-white/20 rounded-xl p-3">
                 <p class="text-2xl font-bold">{{ stats.leadershipScore.experiencePoints }}</p>
-                <p class="text-xs text-white/80">Experiences</p>
+                <p class="text-xs text-white/80">{{ 'experiences' | translate }}</p>
               </div>
               <div class="text-center bg-white/20 rounded-xl p-3">
                 <p class="text-2xl font-bold">{{ stats.leadershipScore.rolePoints }}</p>
-                <p class="text-xs text-white/80">Role Diversity</p>
+                <p class="text-xs text-white/80">{{ 'role_diversity' | translate }}</p>
               </div>
               <div class="text-center bg-white/20 rounded-xl p-3">
                 <p class="text-2xl font-bold">{{ stats.leadershipScore.skillPoints }}</p>
-                <p class="text-xs text-white/80">Skills</p>
+                <p class="text-xs text-white/80">{{ 'skills' | translate }}</p>
               </div>
             </div>
           </div>
@@ -71,9 +73,9 @@ import { takeUntil } from 'rxjs/operators';
                 <!-- Achievements / Badges Section -->
         <div *ngIf="earnedBadges.length > 0" class="mb-8">
           <div class="flex items-center gap-2 mb-4">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Achievements</h2>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ 'achievements' | translate }}</h2>
             <span class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200 text-xs font-bold rounded-full uppercase tracking-wider">
-              {{ earnedBadges.length }} Earned
+              {{ earnedBadges.length }} {{ 'earned' | translate }}
             </span>
           </div>
           
@@ -82,14 +84,14 @@ import { takeUntil } from 'rxjs/operators';
               <div class="relative group">
                 <div [class]="'flex flex-col items-center justify-center p-4 rounded-xl border-2 border-transparent transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-help ' + badge.colorClass">
                   <span class="text-3xl mb-2">{{ badge.icon }}</span>
-                  <span class="text-xs font-bold text-center leading-tight">{{ badge.label }}</span>
+                  <span class="text-xs font-bold text-center leading-tight">{{ badge.label | translate }}</span>
                 </div>
                 
                 <!-- Tooltip -->
                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                   <div class="bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg py-2 px-3 text-center shadow-xl">
-                    <p class="font-bold mb-1">{{ badge.label }}</p>
-                    <p>{{ badge.description }}</p>
+                    <p class="font-bold mb-1">{{ badge.label | translate }}</p>
+                    <p>{{ badge.description | translate }}</p>
                     <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
                   </div>
                 </div>
@@ -98,28 +100,90 @@ import { takeUntil } from 'rxjs/operators';
             
             <!-- Empty slots for unearned (optional, or just show earned) -->
              <div *ngIf="earnedBadges.length === 0" class="col-span-full p-8 text-center bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 text-gray-400">
-               No badges earned yet. Start completing experiences!
+               {{ 'no_badges_yet' | translate }}
              </div>
           </div>
         </div>
 
+        <!-- Personal Activity Timeline -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">📅 {{ 'activity_timeline' | translate }}</h2>
+          <div class="space-y-4 max-h-80 overflow-y-auto pr-2">
+            @for (item of stats.timeline.slice(0, 6); track item.id) {
+              <div 
+                class="relative pl-6 pb-4 border-l-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-r-lg p-2 -ml-2 transition"
+                [class.border-green-400]="item.status === 'active'"
+                [class.border-gray-300]="item.status === 'completed'"
+                [class.border-blue-400]="item.status === 'upcoming'"
+                [class.dark:border-green-500]="item.status === 'active'"
+                [class.dark:border-gray-600]="item.status === 'completed'"
+                [class.dark:border-blue-500]="item.status === 'upcoming'"
+                (click)="openTimelineModal(item)"
+              >
+                <!-- Dot -->
+                <div 
+                  class="absolute left-[-9px] top-2 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center text-[10px]"
+                  [style.background-color]="item.color"
+                >
+                </div>
+                
+                <!-- Content -->
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-lg">{{ item.icon }}</span>
+                    <span 
+                      class="px-2 py-0.5 text-xs font-medium rounded-full"
+                      [class.bg-green-100]="item.status === 'active'"
+                      [class.text-green-700]="item.status === 'active'"
+                      [class.bg-gray-100]="item.status === 'completed'"
+                      [class.text-gray-700]="item.status === 'completed'"
+                      [class.bg-blue-100]="item.status === 'upcoming'"
+                      [class.text-blue-700]="item.status === 'upcoming'"
+                      [class.dark:bg-green-900]="item.status === 'active'"
+                      [class.dark:text-green-300]="item.status === 'active'"
+                      [class.dark:bg-gray-700]="item.status === 'completed'"
+                      [class.dark:text-gray-300]="item.status === 'completed'"
+                      [class.dark:bg-blue-900]="item.status === 'upcoming'"
+                      [class.dark:text-blue-300]="item.status === 'upcoming'"
+                    >
+                      {{ item.status | translate }}
+                    </span>
+                  </div>
+                  <h4 class="font-semibold text-gray-900 dark:text-white text-sm">{{ item.title }}</h4>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ item.department }} • {{ item.date | date:'MMM yyyy' }}</p>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <a routerLink="/experiences" class="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">
+              {{ 'view_all_experiences' | translate }} →
+            </a>
+          </div>
+        </div>
+
+        <!-- ======================= ORGANIZATION OVERVIEW ======================= -->
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ 'organization_overview' | translate }}</h2>
+          <p class="text-gray-500 dark:text-gray-400 text-sm">{{ 'org_overview_subtitle' | translate }}</p>
+        </div>
 
         <!-- Key Metrics Row -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 border-l-4 border-blue-500">
-            <p class="text-gray-500 dark:text-gray-400 text-sm">Members</p>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">{{ 'members' | translate }}</p>
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.totalMembers }}</h3>
           </div>
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 border-l-4 border-indigo-500">
-            <p class="text-gray-500 dark:text-gray-400 text-sm">Experiences</p>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">{{ 'experiences' | translate }}</p>
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.totalExperiences }}</h3>
           </div>
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 border-l-4 border-green-500">
-            <p class="text-gray-500 dark:text-gray-400 text-sm">Active</p>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">{{ 'active' | translate }}</p>
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.activeExperiences }}</h3>
           </div>
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 border-l-4 border-amber-500">
-            <p class="text-gray-500 dark:text-gray-400 text-sm">Completed</p>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">{{ 'completed' | translate }}</p>
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.completedExperiences }}</h3>
           </div>
         </div>
@@ -135,9 +199,9 @@ import { takeUntil } from 'rxjs/operators';
                 </svg>
               </div>
               <div>
-                <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Average Duration</p>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ stats.averageExperienceDuration }} days</h3>
-                <p class="text-xs text-gray-400 dark:text-gray-500">per leadership experience</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ 'average_duration' | translate }}</p>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ stats.averageExperienceDuration }} {{ 'days' | translate }}</h3>
+                <p class="text-xs text-gray-400 dark:text-gray-500">{{ 'per_leadership_experience' | translate }}</p>
               </div>
             </div>
           </div>
@@ -151,9 +215,9 @@ import { takeUntil } from 'rxjs/operators';
                 </svg>
               </div>
               <div>
-                <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Most Common Role</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ 'most_common_role' | translate }}</p>
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ stats.mostCommonRole }}</h3>
-                <p class="text-xs text-gray-400 dark:text-gray-500">top leadership position</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500">{{ 'top_leadership_position' | translate }}</p>
               </div>
             </div>
           </div>
@@ -167,161 +231,100 @@ import { takeUntil } from 'rxjs/operators';
                 </svg>
               </div>
               <div>
-                <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Top Department</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ 'top_dept' | translate }}</p>
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ stats.mostRepresentedDepartment }}</h3>
-                <p class="text-xs text-gray-400 dark:text-gray-500">most represented</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500">{{ 'most_represented' | translate }}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <!-- Pie Charts Column -->
-          <div class="lg:col-span-2 space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Members by Department Chart -->
-              <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Members by Dept</h2>
-                <div class="flex items-center gap-4">
-                  <div class="relative w-32 h-32 flex-shrink-0">
-                    <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-90">
-                      @for (segment of memberDeptSegments; track segment.name) {
-                        <circle cx="50" cy="50" r="40" [attr.stroke]="segment.color" stroke-width="20" fill="transparent"
-                          [attr.stroke-dasharray]="segment.dashArray" [attr.stroke-dashoffset]="segment.dashOffset"/>
-                      }
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                      <p class="text-xl font-bold text-gray-900 dark:text-white">{{ stats.totalMembers }}</p>
-                    </div>
-                  </div>
-                  <div class="flex-1 space-y-1 text-sm">
-                    @for (item of stats.membersByDepartmentChart.slice(0, 5); track item.name) {
-                      <div class="flex items-center gap-2">
-                        <div class="w-2 h-2 rounded-full" [style.background-color]="item.color"></div>
-                        <span class="text-gray-600 dark:text-gray-300 truncate">{{ item.name }}</span>
-                        <span class="font-bold text-gray-900 dark:text-white ml-auto">{{ item.value }}</span>
-                      </div>
-                    }
-                  </div>
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <!-- Members by Department Chart -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ 'members_by_dept' | translate }}</h2>
+            <div class="flex items-center gap-4">
+              <div class="relative w-32 h-32 flex-shrink-0">
+                <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-90">
+                  @for (segment of memberDeptSegments; track segment.name) {
+                    <circle cx="50" cy="50" r="40" [attr.stroke]="segment.color" stroke-width="20" fill="transparent"
+                      [attr.stroke-dasharray]="segment.dashArray" [attr.stroke-dashoffset]="segment.dashOffset"/>
+                  }
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <p class="text-xl font-bold text-gray-900 dark:text-white">{{ stats.totalMembers }}</p>
                 </div>
               </div>
-
-              <!-- Experiences by Role Chart -->
-              <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Experiences by Role</h2>
-                <div class="flex items-center gap-4">
-                  <div class="relative w-32 h-32 flex-shrink-0">
-                    <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-90">
-                      @for (segment of roleSegments; track segment.name) {
-                        <circle cx="50" cy="50" r="40" [attr.stroke]="segment.color" stroke-width="20" fill="transparent"
-                          [attr.stroke-dasharray]="segment.dashArray" [attr.stroke-dashoffset]="segment.dashOffset"/>
-                      }
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                      <p class="text-xl font-bold text-gray-900 dark:text-white">{{ stats.totalExperiences }}</p>
-                    </div>
-                  </div>
-                  <div class="flex-1 space-y-1 text-sm max-h-32 overflow-y-auto">
-                    @for (item of stats.experiencesByRoleChart.slice(0, 5); track item.name) {
-                      <div class="flex items-center gap-2">
-                        <div class="w-2 h-2 rounded-full flex-shrink-0" [style.background-color]="item.color"></div>
-                        <span class="text-gray-600 dark:text-gray-300 truncate">{{ item.name }}</span>
-                        <span class="font-bold text-gray-900 dark:text-white ml-auto">{{ item.value }}</span>
-                      </div>
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Top Skills -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-              <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Top 5 Skills</h2>
-              <div class="grid grid-cols-5 gap-3">
-                @for (skill of stats.topSkills; track skill.skill; let i = $index) {
-                  <div class="text-center">
-                    <div class="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold" [ngClass]="getSkillBgClass(i)">
-                      {{ i + 1 }}
-                    </div>
-                    <p class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{{ skill.skill }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ skill.count }}x</p>
+              <div class="flex-1 space-y-1 text-sm">
+                @for (item of stats.membersByDepartmentChart.slice(0, 5); track item.name) {
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full" [style.background-color]="item.color"></div>
+                    <span class="text-gray-600 dark:text-gray-300 truncate">{{ item.name }}</span>
+                    <span class="font-bold text-gray-900 dark:text-white ml-auto">{{ item.value }}</span>
                   </div>
                 }
               </div>
             </div>
           </div>
 
-          <!-- Activity Timeline Column -->
+          <!-- Experiences by Role Chart -->
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">📅 Activity Timeline</h2>
-            <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
-              @for (item of stats.timeline.slice(0, 8); track item.id) {
-                <div 
-                  class="relative pl-6 pb-4 border-l-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-r-lg p-2 -ml-2 transition"
-                  [class.border-green-400]="item.status === 'active'"
-                  [class.border-gray-300]="item.status === 'completed'"
-                  [class.border-blue-400]="item.status === 'upcoming'"
-                  [class.dark:border-green-500]="item.status === 'active'"
-                  [class.dark:border-gray-600]="item.status === 'completed'"
-                  [class.dark:border-blue-500]="item.status === 'upcoming'"
-                  (click)="openTimelineModal(item)"
-                >
-                  <!-- Dot -->
-                  <div 
-                    class="absolute left-[-9px] top-2 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center text-[10px]"
-                    [style.background-color]="item.color"
-                  >
-                  </div>
-                  
-                  <!-- Content -->
-                  <div>
-                    <div class="flex items-center gap-2 mb-1">
-                      <span class="text-lg">{{ item.icon }}</span>
-                      <span 
-                        class="px-2 py-0.5 text-xs font-medium rounded-full"
-                        [class.bg-green-100]="item.status === 'active'"
-                        [class.text-green-700]="item.status === 'active'"
-                        [class.bg-gray-100]="item.status === 'completed'"
-                        [class.text-gray-700]="item.status === 'completed'"
-                        [class.bg-blue-100]="item.status === 'upcoming'"
-                        [class.text-blue-700]="item.status === 'upcoming'"
-                        [class.dark:bg-green-900]="item.status === 'active'"
-                        [class.dark:text-green-300]="item.status === 'active'"
-                        [class.dark:bg-gray-700]="item.status === 'completed'"
-                        [class.dark:text-gray-300]="item.status === 'completed'"
-                        [class.dark:bg-blue-900]="item.status === 'upcoming'"
-                        [class.dark:text-blue-300]="item.status === 'upcoming'"
-                      >
-                        {{ item.status }}
-                      </span>
-                    </div>
-                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">{{ item.title }}</h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ item.department }} • {{ item.date | date:'MMM yyyy' }}</p>
-                  </div>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ 'experiences_by_role' | translate }}</h2>
+            <div class="flex items-center gap-4">
+              <div class="relative w-32 h-32 flex-shrink-0">
+                <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-90">
+                  @for (segment of roleSegments; track segment.name) {
+                    <circle cx="50" cy="50" r="40" [attr.stroke]="segment.color" stroke-width="20" fill="transparent"
+                      [attr.stroke-dasharray]="segment.dashArray" [attr.stroke-dashoffset]="segment.dashOffset"/>
+                  }
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <p class="text-xl font-bold text-gray-900 dark:text-white">{{ stats.totalExperiences }}</p>
                 </div>
-              }
+              </div>
+              <div class="flex-1 space-y-1 text-sm max-h-32 overflow-y-auto">
+                @for (item of stats.experiencesByRoleChart.slice(0, 5); track item.name) {
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full flex-shrink-0" [style.background-color]="item.color"></div>
+                    <span class="text-gray-600 dark:text-gray-300 truncate">{{ item.name }}</span>
+                    <span class="font-bold text-gray-900 dark:text-white ml-auto">{{ item.value }}</span>
+                  </div>
+                }
+              </div>
             </div>
-            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <a routerLink="/experiences" class="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">
-                View all experiences →
-              </a>
-            </div>
+          </div>
+        </div>
+
+        <!-- Top Skills -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ 'top_5_skills' | translate }}</h2>
+          <div class="grid grid-cols-5 gap-3">
+            @for (skill of stats.topSkills; track skill.skill; let i = $index) {
+              <div class="text-center">
+                <div class="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold" [ngClass]="getSkillBgClass(i)">
+                  {{ i + 1 }}
+                </div>
+                <p class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{{ skill.skill }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ skill.count }}x</p>
+              </div>
+            }
           </div>
         </div>
 
         <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <a routerLink="/members" class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-5 hover:shadow-lg hover:scale-[1.02] transition-all">
-            <h3 class="text-lg font-bold mb-1">Members</h3>
-            <p class="text-blue-100 text-sm">Manage committee members</p>
+            <h3 class="text-lg font-bold mb-1">{{ 'members' | translate }}</h3>
+            <p class="text-blue-100 text-sm">{{ 'manage_committee_members' | translate }}</p>
           </a>
           <a routerLink="/experiences" class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl p-5 hover:shadow-lg hover:scale-[1.02] transition-all">
-            <h3 class="text-lg font-bold mb-1">Experiences</h3>
-            <p class="text-indigo-100 text-sm">Track leadership journeys</p>
+            <h3 class="text-lg font-bold mb-1">{{ 'experiences' | translate }}</h3>
+            <p class="text-indigo-100 text-sm">{{ 'track_leadership_journeys' | translate }}</p>
           </a>
           <a routerLink="/profile" class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-5 hover:shadow-lg hover:scale-[1.02] transition-all">
-            <h3 class="text-lg font-bold mb-1">Profile</h3>
-            <p class="text-purple-100 text-sm">Your personal settings</p>
+            <h3 class="text-lg font-bold mb-1">{{ 'profile' | translate }}</h3>
+            <p class="text-purple-100 text-sm">{{ 'your_personal_settings' | translate }}</p>
           </a>
         </div>
       </div>
@@ -330,7 +333,7 @@ import { takeUntil } from 'rxjs/operators';
       <div *ngIf="!stats" class="flex items-center justify-center min-h-screen">
         <div class="text-center">
           <div class="w-12 h-12 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 rounded-full animate-spin"></div>
-          <p class="text-gray-600 dark:text-gray-400 mt-4">Loading dashboard...</p>
+          <p class="text-gray-600 dark:text-gray-400 mt-4">{{ 'loading_dashboard' | translate }}</p>
         </div>
       </div>
 

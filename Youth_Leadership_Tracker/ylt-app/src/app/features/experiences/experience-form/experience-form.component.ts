@@ -4,6 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { ExperiencesService } from '../../../services/experiences.service';
 import { MembersService } from '../../../services/members.service';
+import { LanguageService } from '../../../services/language.service';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
 import { Experience, ExperienceFormData } from '../../../models/experience';
 import { Member } from '../../../models/member';
 import { Subject } from 'rxjs';
@@ -13,7 +15,7 @@ import { Skills } from '../../../models/enums';
 @Component({
   selector: 'app-experience-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe],
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <!-- Header -->
@@ -21,14 +23,14 @@ import { Skills } from '../../../models/enums';
         <div class="max-w-4xl mx-auto px-4 py-6">
           <div class="flex items-center gap-3 mb-2">
             <a routerLink="/experiences" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold">
-              ← Back to Experiences
+              ← {{ 'back_to_experiences' | translate }}
             </a>
           </div>
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-            {{ isEditMode ? 'Edit Experience' : 'Create New Experience' }}
+            {{ (isEditMode ? 'edit_experience' : 'create_new_experience') | translate }}
           </h1>
           <p class="text-gray-600 dark:text-gray-400 mt-2">
-            {{ isEditMode ? 'Update experience details' : 'Add a new leadership experience' }}
+            {{ (isEditMode ? 'update_experience_desc' : 'add_new_experience_desc') | translate }}
           </p>
         </div>
       </div>
@@ -50,76 +52,76 @@ import { Skills } from '../../../models/enums';
             <!-- Member Selection -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Member <span class="text-red-500">*</span>
+                {{ 'member' | translate }} <span class="text-red-500">*</span>
               </label>
               <select
                 formControlName="memberId"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
               >
-                <option value="">Select Member</option>
+                <option value="">{{ 'select_member' | translate }}</option>
                 @for (member of members; track member.id) {
                   <option [value]="member.id">{{ member.fullName }}</option>
                 }
               </select>
               <p *ngIf="isFieldInvalid('memberId')" class="text-red-500 dark:text-red-400 text-sm mt-1">
-                Member is required
+                {{ 'member' | translate }} {{ 'required_field' | translate }}
               </p>
             </div>
 
             <!-- Role -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Role <span class="text-red-500">*</span>
+                {{ 'role' | translate }} <span class="text-red-500">*</span>
               </label>
               <select
                 formControlName="role"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
               >
-                <option value="">Select Role</option>
-                <option value="Team Member">Team Member</option>
-                <option value="Team Leader">Team Leader</option>
-                <option value="Vice President">Vice President</option>
-                <option value="Local Committee President">Local Committee President</option>
-                <option value="OC Member">OC Member</option>
-                <option value="OC Vice President">OC Vice President</option>
-                <option value="OC President">OC President</option>
-                <option value="Local Support Team">Local Support Team</option>
-                <option value="Entity Support Team">Entity Support Team</option>
+                <option value="">{{ 'select_role' | translate }}</option>
+                <option value="Team Member">{{ 'team_member' | translate }}</option>
+                <option value="Team Leader">{{ 'team_leader' | translate }}</option>
+                <option value="Vice President">{{ 'vice_president' | translate }}</option>
+                <option value="Local Committee President">{{ 'local_committee_president' | translate }}</option>
+                <option value="OC Member">{{ 'oc_member' | translate }}</option>
+                <option value="OC Vice President">{{ 'oc_vice_president' | translate }}</option>
+                <option value="OC President">{{ 'oc_president' | translate }}</option>
+                <option value="Local Support Team">{{ 'local_support_team' | translate }}</option>
+                <option value="Entity Support Team">{{ 'entity_support_team' | translate }}</option>
               </select>
               <p *ngIf="isFieldInvalid('role')" class="text-red-500 dark:text-red-400 text-sm mt-1">
-                Role is required
+                {{ 'role' | translate }} {{ 'required_field' | translate }}
               </p>
             </div>
 
             <!-- Department -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Department <span class="text-red-500">*</span>
+                {{ 'department' | translate }} <span class="text-red-500">*</span>
               </label>
               <select
                 formControlName="department"
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
               >
-                <option value="">Select Department</option>
-                <option value="IGV">IGV (Incoming Global Volunteer)</option>
-                <option value="IGT">IGT (Incoming Global Talent)</option>
-                <option value="OGV">OGV (Outgoing Global Volunteer)</option>
-                <option value="OGT">OGT (Outgoing Global Talent)</option>
-                <option value="Talent Management">Talent Management</option>
-                <option value="Finance">Finance</option>
-                <option value="Business Development">Business Development</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Information Management">Information Management</option>
+                <option value="">{{ 'select_department' | translate }}</option>
+                <option value="IGV">{{ 'IGV' | translate }}</option>
+                <option value="IGT">{{ 'IGT' | translate }}</option>
+                <option value="OGV">{{ 'OGV' | translate }}</option>
+                <option value="OGT">{{ 'OGT' | translate }}</option>
+                <option value="Talent Management">{{ 'tm' | translate }}</option>
+                <option value="Finance">{{ 'finance' | translate }}</option>
+                <option value="Business Development">{{ 'bd' | translate }}</option>
+                <option value="Marketing">{{ 'marketing' | translate }}</option>
+                <option value="Information Management">{{ 'im' | translate }}</option>
               </select>
               <p *ngIf="isFieldInvalid('department')" class="text-red-500 dark:text-red-400 text-sm mt-1">
-                Department is required
+                {{ 'department' | translate }} {{ 'required_field' | translate }}
               </p>
             </div>
 
             <!-- Start Date -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Start Date <span class="text-red-500">*</span>
+                {{ 'start_date' | translate }} <span class="text-red-500">*</span>
               </label>
               <input
                 type="date"
@@ -127,14 +129,14 @@ import { Skills } from '../../../models/enums';
                 class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
               />
               <p *ngIf="isFieldInvalid('startDate')" class="text-red-500 dark:text-red-400 text-sm mt-1">
-                Start date is required
+                {{ 'start_date' | translate }} {{ 'required_field' | translate }}
               </p>
             </div>
 
             <!-- End Date -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                End Date (Optional - leave empty for ongoing)
+                {{ 'end_date_optional' | translate }}
               </label>
               <input
                 type="date"
@@ -144,26 +146,52 @@ import { Skills } from '../../../models/enums';
             </div>
           </div>
 
-          <!-- Description -->
+          <!-- Description (English) -->
           <div class="mt-6">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Description <span class="text-red-500">*</span>
+              {{ 'description' | translate }} (English) <span class="text-red-500">*</span>
             </label>
             <textarea
               formControlName="description"
               rows="4"
               class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
-              placeholder="Describe the experience, responsibilities, and achievements..."
+              [placeholder]="'describe_experience_en' | translate"
             ></textarea>
             <p *ngIf="isFieldInvalid('description')" class="text-red-500 dark:text-red-400 text-sm mt-1">
-              Description is required
+              {{ 'description' | translate }} {{ 'required_field' | translate }}
             </p>
+          </div>
+
+          <!-- Description (French) -->
+          <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {{ 'describe_experience_fr' | translate }}
+            </label>
+            <textarea
+              formControlName="description_fr"
+              rows="4"
+              class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
+              [placeholder]="'describe_experience_fr_placeholder' | translate"
+            ></textarea>
+          </div>
+
+          <!-- Description (Spanish) -->
+          <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {{ 'describe_experience_es' | translate }}
+            </label>
+            <textarea
+              formControlName="description_es"
+              rows="4"
+              class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition"
+              [placeholder]="'describe_experience_es_placeholder' | translate"
+            ></textarea>
           </div>
 
           <!-- Skills Selection -->
           <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-              Skills Gained <span class="text-red-500">*</span>
+              {{ 'skills_gained' | translate }} <span class="text-red-500">*</span>
             </label>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               @for (skill of skillsList; track skill) {
@@ -176,13 +204,13 @@ import { Skills } from '../../../models/enums';
                     class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 cursor-pointer"
                   />
                   <label [for]="'skill-' + skill" class="ml-3 text-gray-700 dark:text-gray-300 cursor-pointer">
-                    {{ skill }}
+                    {{ skill | translate }}
                   </label>
                 </div>
               }
             </div>
             <p *ngIf="isFieldInvalid('skillsGained')" class="text-red-500 dark:text-red-400 text-sm mt-2">
-              Select at least one skill
+              {{ 'select_at_least_one_skill' | translate }}
             </p>
           </div>
 
@@ -191,7 +219,7 @@ import { Skills } from '../../../models/enums';
             <div class="flex flex-wrap gap-2">
               @for (skill of experienceForm.get('skillsGained')?.value; track skill) {
                 <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-sm font-semibold rounded-full">
-                  {{ skill }}
+                  {{ skill | translate }}
                 </span>
               }
             </div>
@@ -205,15 +233,15 @@ import { Skills } from '../../../models/enums';
               class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span *ngIf="!isLoading">
-                {{ isEditMode ? 'Update Experience' : 'Create Experience' }}
+                {{ (isEditMode ? 'update_experience' : 'create_experience') | translate }}
               </span>
-              <span *ngIf="isLoading">Processing...</span>
+              <span *ngIf="isLoading">{{ 'processing' | translate }}</span>
             </button>
             <a
               routerLink="/experiences"
               class="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-center"
             >
-              Cancel
+              {{ 'cancel' | translate }}
             </a>
           </div>
         </form>
@@ -232,6 +260,7 @@ export class ExperienceFormComponent implements OnInit, OnDestroy {
   private membersService = inject(MembersService);
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
+  languageService = inject(LanguageService);
 
   experienceForm!: FormGroup;
   isEditMode = false;
@@ -265,6 +294,8 @@ export class ExperienceFormComponent implements OnInit, OnDestroy {
       role: ['', Validators.required],
       department: ['', Validators.required],
       description: ['', Validators.required],
+      description_fr: [''],
+      description_es: [''],
       startDate: ['', Validators.required],
       endDate: [null],
       skillsGained: [[], Validators.required]
@@ -306,6 +337,8 @@ export class ExperienceFormComponent implements OnInit, OnDestroy {
               role: experience.role,
               department: experience.department,
               description: experience.description,
+              description_fr: (experience as any).description_fr || '',
+              description_es: (experience as any).description_es || '',
               startDate: new Date(experience.startDate).toISOString().split('T')[0],
               endDate: endDate,
               skillsGained: experience.skillsGained
